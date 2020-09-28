@@ -10,7 +10,6 @@ https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html
 ## ECS terminology
 
 Task Definition — This a blueprint that describes how a docker container should launch. It contains settings like exposed port, docker image, cpu shares, memory requirement, command to run and environmental variables.
-https://docs.aws.amazon.com/AmazonECS/latest/userguide/task_definitions.html
 
 Task — This is a running container with the settings defined in the Task Definition. It can be thought of as an “instance” of a Task Definition.
 
@@ -24,6 +23,14 @@ Container Instance — This is just an EC2 instance that is part of an ECS Clust
 An Amazon ECS cluster is a logical grouping of tasks or services. You can register one or more Amazon EC2 instances, also referred to as container instances with your cluster to run tasks on, or you can use the serverless infrastructure that Fargate provides. When your tasks are run on Fargate, your cluster resources are managed by Fargate.
 For more control, you can host your tasks on a cluster of Amazon EC2 instances that you manage by using the EC2 launch type. 
 
+# Cloud Formation and Task Definition
+
+AWS CloudFormation is a service that helps you model and set up your Amazon Web Services resources. You create a template that describes all the AWS resources that you want (like Amazon EC2 instances or Amazon RDS DB instances), and AWS CloudFormation takes care of provisioning and configuring those resources for you. You don't need to individually create and configure AWS resources and figure out what's dependent on what; 
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html
+
+To declare Task Definition entity in CloudFormation json or yaml files can be used. Task definition documentation: https://docs.aws.amazon.com/AmazonECS/latest/userguide/task_definitions.html
+
+
 ## Task definition properties
 https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecs-taskdefinition.html
 
@@ -36,7 +43,7 @@ https://docs.amazonaws.cn/en_us/AmazonECS/latest/developerguide/bind-mounts.html
 ## Secrets
 https://docs.amazonaws.cn/en_us/AmazonECS/latest/userguide/ecs-ug.pdf [pg 54]
 
-# Networking
+## Networking
 When you use the awsvpc network mode in your task definitions, every task that is launched from that task definition gets its own elastic network interface (ENI) and a primary private IP address. 
 https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html
 
