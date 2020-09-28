@@ -47,4 +47,7 @@ https://docs.amazonaws.cn/en_us/AmazonECS/latest/userguide/ecs-ug.pdf [pg 54]
 When you use the awsvpc network mode in your task definitions, every task that is launched from that task definition gets its own elastic network interface (ENI) and a primary private IP address. 
 https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html
 
+Note: When networkMode=awsvpc, the host ports and container ports in port mappings must match.
 
+## HashiCorp Vault - AWS Secrets Engine
+https://www.vaultproject.io/docs/secrets/aws#aws-secrets-engine

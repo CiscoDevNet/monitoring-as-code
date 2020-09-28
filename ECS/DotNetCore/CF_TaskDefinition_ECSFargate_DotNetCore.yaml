@@ -3,19 +3,22 @@ Description: An CloudFormation template for Fargate. Creates Task Definition run
 Parameters:
   JavaApplicationImage:
     Type: String
-    Default: sashaz/java-services:v5
+    Default: mcr.microsoft.com/dotnet/core/samples:aspnetapp
   AppdAgentImage:
     Type: String
-    Default: appdynamics/java-agent:20.8.0
+    Default: appdynamics/dotnet-core-agent:20.7.0
   ApplicationServiceName:
     Type: String
-    Default: JavaHelloWorldApp
+    Default: DotNetCoreHelloWorldApp
   AppdAgentServiceName:
     Type: String
     Default: AppdJavaAgent
   ContainerPort:
     Type: Number
-    Default: 8080
+    Default: 80
+  HostPort:
+    Type: Number
+    Default: 80 # When networkMode=awsvpc, the host ports and container ports in port mappings must match
   # logs
   LogGroup:
     Type: String
@@ -25,7 +28,7 @@ Parameters:
     Default: eu-west-2
   LogPrefix:
     Type: String
-    Default: JavaApp
+    Default: DotNetApp
   # secrets
   AppDSecretAccessKey:
     Type: String
@@ -49,17 +52,27 @@ Parameters:
     Default: customer1
   AppDAgentApplicationName:
     Type: String
-    Default: ECS-Fargate-Java
+    Default: ECS-Fargate
   AppDAgentTierName:
     Type: String
-    Default: JavaTier
+    Default: DotNetTier
   AppDAgentReuseNodeName:
     Type: String
     Default: true
     AllowedValues: [true, false]
   AppDAgentReuseNodeNamePrefix:
     Type: String
-    Default: JavaNode
+    Default: DotNetNode
+  # CLR 
+  CoreClrProfiler:
+    Type: String
+    Default: "{57e1aa68-2229-41aa-9931-a6e93bbc64d8}"
+  CoreClrEnableProfiling:
+    Type: Number
+    Default: 1
+  CoreClrProfilerPath:
+    Type: String
+    Default: /opt/appdynamics-agent/dotnet/libappdprofiler.so
 Resources:
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -97,7 +110,7 @@ Resources:
           Image: !Ref JavaApplicationImage
           PortMappings:
             - containerPort: !Ref ContainerPort 
-              hostPort: !Ref ContainerPort 
+              hostPort: !Ref HostPort 
               protocol: tcp 
           Essential: true
           DependsOn:
@@ -105,12 +118,12 @@ Resources:
             condition: COMPLETE
           mountPoints: # The mount points for data volumes in your container.
           - sourceVolume: 'appd-agent-volume'
-            containerPath: '/opt/appdynamics-agent'
+            containerPath: '/opt/appdynamics-agent/dotnet'
             readOnly: false
           Command: 
           - /bin/sh
           - -c
-          - java $JAVA_OPTS -jar /java-services.jar
+          - ls /opt/appdynamics-agent/dotnet
           logConfiguration: # The log configuration specification for the container.
             logDriver: awslogs  # [REQUIRED] The log driver to use for the container. Valid values are: json-file, syslog, journald, gelf, fluentd, awslogs, splunk, awsfirelens.
             options: # The configuration options to send to the log driver.
@@ -133,12 +146,18 @@ Resources:
             value: !Ref AppDAgentApplicationName
           - name: 'APPDYNAMICS_AGENT_TIER_NAME'
             value: !Ref AppDAgentTierName
-          - name: 'APPDYNAMICS_JAVA_AGENT_REUSE_NODE_NAME'
+          - name: 'APPDYNAMICS_AGENT_REUSE_NODE_NAME'
             value: !Ref AppDAgentReuseNodeName
-          - name: 'APPDYNAMICS_JAVA_AGENT_REUSE_NODE_NAME_PREFIX'
+          - name: 'APPDYNAMICS_AGENT_REUSE_NODE_NAME_PREFIX'
             value: !Ref AppDAgentReuseNodeNamePrefix
-          - name: 'JAVA_OPTS'
-            value: ' -javaagent:/opt/appdynamics-agent/javaagent.jar '
+          - name: CORECLR_PROFILER
+            value: !Ref CoreClrProfiler
+          - name: CORECLR_ENABLE_PROFILING
+            value: !Ref CoreClrEnableProfiling
+          - name: CORECLR_PROFILER_PATH
+            value: !Ref CoreClrProfilerPath
+          #- name: LD_LIBRARY_PATH
+          #  value: /opt/appdynamics-agent/dotnet
         - Name: !Ref AppdAgentServiceName
           Image: !Ref AppdAgentImage
           Essential: false 
