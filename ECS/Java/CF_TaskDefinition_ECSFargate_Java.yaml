@@ -16,6 +16,7 @@ Parameters:
   ContainerPort:
     Type: Number
     Default: 8080
+  # logs
   LogGroup:
     Type: String
     Default: testTask # TODO LogGroup needs to exist in CloudWatch (remove logConfiguration if logs are not to be used)
@@ -25,6 +26,40 @@ Parameters:
   LogPrefix:
     Type: String
     Default: JavaApp
+  # secrets
+  AppDSecretAccessKey:
+    Type: String
+    Default: arn:aws:secretsmanager:eu-west-2:032263611943:secret:APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY-oFRoeE
+  PolicyGetSecrets:
+    Type: String
+    Default: arn:aws:iam::032263611943:policy/AppdynamicsAgentGetSecretsPolicy
+  # AppD properties
+  AppDControllerHost:
+    Type: String
+    Default: nwmaas-2081nosshcontro-dw1rwn6a.appd-cx.com
+  AppDControllerPort:
+    Type: Number
+    Default: 8090
+  AppDControllerSslEnabled:
+    Type: String
+    Default: false
+    AllowedValues: [true, false]
+  AppDAgentAccountName:
+    Type: String
+    Default: customer1
+  AppDAgentApplicationName:
+    Type: String
+    Default: ECS-Fargate-Java
+  AppDAgentTierName:
+    Type: String
+    Default: JavaTier
+  AppDAgentReuseNodeName:
+    Type: String
+    Default: true
+    AllowedValues: [true, false]
+  AppDAgentReuseNodeNamePrefix:
+    Type: String
+    Default: JavaNode
 Resources:
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -82,25 +117,26 @@ Resources:
               awslogs-group: !Ref LogGroup
               awslogs-region: !Ref LogRegion
               awslogs-stream-prefix: !Ref LogPrefix
+          secrets: # The secrets to pass to the container.
+          - name: 'APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY'  # [REQUIRED] The name of the secret.
+            valueFrom: !Ref AppDSecretAccessKey
           environment: # The environment variables to pass to a container.
           - name: 'APPDYNAMICS_CONTROLLER_HOST_NAME'
-            value: 'controller_here'
+            value: !Ref AppDControllerHost
           - name: 'APPDYNAMICS_CONTROLLER_PORT'
-            value: '8090'
+            value: !Ref AppDControllerPort
           - name: 'APPDYNAMICS_CONTROLLER_SSL_ENABLED'
-            value: 'false'
+            value: !Ref AppDControllerSslEnabled
           - name: 'APPDYNAMICS_AGENT_ACCOUNT_NAME'
-            value: 'account_here'
-          - name: 'APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY'
-            value: 'secret_here'
+            value: !Ref AppDAgentAccountName
           - name: 'APPDYNAMICS_AGENT_APPLICATION_NAME'
-            value: 'ECS_JavaApp_Fargate'
-          - name: 'APPDYNAMICS_JAVA_AGENT_REUSE_NODE_NAME'
-            value: 'true'
-          - name: 'APPDYNAMICS_JAVA_AGENT_REUSE_NODE_NAME_PREFIX'
-            value: 'JavaNode'
+            value: !Ref AppDAgentApplicationName
           - name: 'APPDYNAMICS_AGENT_TIER_NAME'
-            value: 'JavaTier'
+            value: !Ref AppDAgentTierName
+          - name: 'APPDYNAMICS_JAVA_AGENT_REUSE_NODE_NAME'
+            value: !Ref AppDAgentReuseNodeName
+          - name: 'APPDYNAMICS_JAVA_AGENT_REUSE_NODE_NAME_PREFIX'
+            value: !Ref AppDAgentReuseNodeNamePrefix
           - name: 'JAVA_OPTS'
             value: ' -javaagent:/opt/appdynamics-agent/javaagent.jar '
         - Name: !Ref AppdAgentServiceName
@@ -128,6 +164,7 @@ Resources:
             Action: 'sts:AssumeRole'
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+        - !Ref PolicyGetSecrets
   # A role for the containers
   TaskRole:
     Type: AWS::IAM::Role
