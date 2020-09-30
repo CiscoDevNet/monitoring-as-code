@@ -1,0 +1,1 @@
+oc create secret generic cluster-agent-secret --from-literal=controller-key="key"
