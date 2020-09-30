@@ -1,5 +1,5 @@
 .vscode/
 *.DS_Store
-ECS/DotNetCore/AppDynamics-DotNetCore-linux-x64-20.9.0
+*AppDynamics-DotNetCore-linux-x64-20.9.0
 *.zip
-OpenShift/ClusterAgent/appdynamics-cluster-agent-rhel-linux-20.9.0.1662
+*appdynamics-cluster-agent-rhel-linux-20.9.0.1662

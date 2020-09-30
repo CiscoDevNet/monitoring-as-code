@@ -4,8 +4,20 @@ metadata:
   creationTimestamp: null
   labels:
     name: dotnet-app
-  name: dotnet-app-pod
+  name: dotnet-app-init
 spec:
+  initContainers:
+  - image: appdynamics/dotnet-core-agent:20.7.0
+    name: appd-agent
+    command:
+      - cp
+      - -ra
+      - /opt/appdynamics/.
+      - /opt/appd
+    imagePullPolicy: Always
+    volumeMounts:
+    - mountPath: /opt/appd
+      name: appd-agent-volume
   containers:
   - image: microsoft/dotnet-samples:aspnetapp
     name: dotnet-app
@@ -19,14 +31,24 @@ spec:
     envFrom:
     - configMapRef:
         name: appd-controller-config
+    - configMapRef:
+        name: appd-dotnet-config
     env:
     - name: APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY
       valueFrom:
         secretKeyRef:
           name: appd-secrets
           key: account-access-key
+    - name: APPDYNAMICS_AGENT_APPLICATION_NAME
+      value: OpenShift-DotNet-InitCont
     ports:
     - containerPort: 80
+    volumeMounts:
+    - mountPath: /opt/appd/dotnet
+      name: appd-agent-volume
   dnsPolicy: ClusterFirst
   restartPolicy: Always
+  volumes:
+  - name: appd-agent-volume
+    emptyDir: {}
 status: {}
