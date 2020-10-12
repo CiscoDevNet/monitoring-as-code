@@ -1,4 +1,16 @@
-\
+# OpenShift cluster and login
+Start OpenShift cluster
+Login to console
+
+# Deploy and configure cluster agent
+./ClusterAgent
+
+# Deploy and configure application agent
+./DotNetCore
+
+_______
+
+
 resolve dns:
 
 https://www.openshift.com/blog/troubleshooting-openshift-internal-networking

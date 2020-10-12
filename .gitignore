@@ -3,3 +3,4 @@
 *AppDynamics-DotNetCore-linux-x64-20.9.0
 *.zip
 *appdynamics-cluster-agent-rhel-linux-20.9.0.1662
+local.*

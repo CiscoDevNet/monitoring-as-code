@@ -8,6 +8,6 @@ spec:
   controllerUrl: "http://nwmaas-2081nosshcontro-dw1rwn6a.appd-cx.com:8090"
   account: "customer1"
   # docker image info
-  image: "docker.io/appdynamics/cluster-agent:20.7.0"
+  image: "docker.io/appdynamics/cluster-agent:20.9.1"
   serviceAccountName: appdynamics-cluster-agent
-  nsToMonitor: [appdynamics,default,dev,stage]
+  nsToMonitor: [appdynamics,default]
