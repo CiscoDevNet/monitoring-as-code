@@ -31,10 +31,12 @@ From the Controller UI panel:
 
 OR
 
- "Modify the nsToMonitor field in the cluster-agent.yaml file before deploying the Cluster Agent. Namespaces mentioned in the nsToMonitor field are only considered during initial registration." [...]but nsToMonitorRegex field can be dynamically changed.
+ "Modify the nsToMonitor field in the cluster-agent.yaml file before deploying the Cluster Agent. Namespaces mentioned in the nsToMonitor field are only considered during initial registration." [...] however nsToMonitorRegex field can be dynamically changed.
  https://docs.appdynamics.com/display/PRO45/Use+the+Cluster+Agent
 
-To use the nsToMonitorRegex field, ensure that you are using the Controller version 20.10 or later and the agent version 20.9 or later.
+ Note that 'nsToMonitorRegex' parameter supersedes nsToMonitor.If you do not specify any value for this parameter, Cluster Agent uses the default value of nsToMonitor.
+
+To use the 'nsToMonitorRegex' field, ensure that you are using the Controller version 20.10 or later and the agent version 20.9 or later.
 
 
 # Correlate Application agents with ClusterAgent
