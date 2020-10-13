@@ -4,10 +4,23 @@ metadata:
   name: k8s-cluster-agent
   namespace: appdynamics
 spec:
-  appName: "OpenShift-Operator-Appd"
-  controllerUrl: "http://nwmaas-2081nosshcontro-dw1rwn6a.appd-cx.com:8090"
+  appName: "OpenShift-Operator-20.9.1"
+  controllerUrl: "http://nwmaas-20100nosshcontr-r6y4tftd.appd-cx.com:8090"
   account: "customer1"
-  # docker image info
   image: "docker.io/appdynamics/cluster-agent:20.9.1"
   serviceAccountName: appdynamics-cluster-agent
-  nsToMonitor: [appdynamics,default]
+  #nsToMonitor:
+  #  - appdynamics
+  #  - default
+  ## nsToMonitorRegex parameter supersedes nsToMonitor
+  ## Available at Cluster Agent v20.9+, Controller v20.10+
+  nsToMonitorRegex: kube-system|appdynamics|default
+  ## Filter pods based on label or RegEx
+  podFilter:
+    blacklistedLabels:
+      - name: app-to-ignore
+    blacklistedNames:
+      - test-pod
+    whitelistedNames:
+      - dotnet-app-init
+  logLevel: "INFO"

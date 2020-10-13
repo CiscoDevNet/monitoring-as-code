@@ -48,3 +48,9 @@ oc create -f cluster-agent-operator-openshift.yaml
 oc apply -f cluster-agent.yaml
 `
 
+# Refs (examples)
+## cluster agent
+https://github.com/Appdynamics/appdynamics-operator#clusteragent-deployment
+
+## infrastructure visibility
+https://github.com/Appdynamics/appdynamics-operator#the-machine-agent-deployment
