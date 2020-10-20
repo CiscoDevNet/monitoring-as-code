@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: dotnet-app-pod-init
+  name: dotnet-app-pod-auto
 spec:
   selector:
-    name: dotnet-app-pod-init
+    name: dotnet-app-pod-auto
   ports:
   - name: "80"
     port: 80
@@ -16,24 +16,12 @@ kind: Pod
 metadata:
   creationTimestamp: null
   labels:
-    name: dotnet-app-pod-init
-  name: dotnet-app-pod-init
+    name: dotnet-app-pod-auto
+  name: dotnet-app-pod-auto
 spec:
-  initContainers:
-  - image: appdynamics/dotnet-core-agent:20.7.0 # agent image
-    name: appd-agent
-    command:
-      - cp
-      - -ra
-      - /opt/appdynamics/.
-      - /opt/appd
-    imagePullPolicy: Always
-    volumeMounts:
-    - mountPath: /opt/appd
-      name: appd-agent-volume
   containers:
   - image: microsoft/dotnet-samples:aspnetapp # application image
-    name: dotnet-app-pod-init
+    name: dotnet-app-pod-auto
     resources: 
       limits:
         cpu: 200m
@@ -50,16 +38,8 @@ spec:
         secretKeyRef:
           name: appd-secrets
           key: account-access-key
-    - name: APPDYNAMICS_AGENT_APPLICATION_NAME
-      value: OpenShift-DotNet-Application
     ports:
     - containerPort: 80
-    volumeMounts:
-    - mountPath: /opt/appd/dotnet
-      name: appd-agent-volume
   dnsPolicy: ClusterFirst
   restartPolicy: Always
-  volumes:
-  - name: appd-agent-volume
-    emptyDir: {}
 status: {}
