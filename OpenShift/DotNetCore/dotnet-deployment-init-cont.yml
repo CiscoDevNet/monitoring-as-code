@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appd-dotnet-agent
+spec:
+  selector:
+    matchLabels:
+      app: appd-dotnet-agent
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: appd-dotnet-agent
+        tier: backend
+        track: stable
+    spec:
+      serviceAccountName: appd-account
+      volumes:
+        - name: appd-agent-volume
+          emptyDir: {}
+      initContainers:
+      - image: appdynamics/dotnet-core-agent:20.7.0 # agent image
+        name: appd-agent
+        command:
+          - cp
+          - -ra
+          - /opt/appdynamics/.
+          - /opt/appd
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /opt/appd
+          name: appd-agent-volume
+      containers:
+      - image: microsoft/dotnet-samples:aspnetapp # application image
+        imagePullPolicy: Always
+        name: dotnet-app-deploy
+        ports:
+        - name: http
+          containerPort: 80
+        resources: 
+          limits:
+            cpu: 100m
+            memory: 100M
+          requests:
+            cpu: 50m
+            memory: 100M       
+        envFrom:
+        - configMapRef:
+            name: appd-dotnet-config
+        env:
+        - name: APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: appd-secrets
+              key: account-access-key
+        - name: APPDYNAMICS_AGENT_APPLICATION_NAME
+          value: DotNet-Deployment-Init-Cont
+        - name: APPDYNAMICS_AGENT_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: appd-agent-volume
+          mountPath: /opt/appd/dotnet
