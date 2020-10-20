@@ -12,15 +12,28 @@ spec:
   #nsToMonitor:
   #  - appdynamics
   #  - default
-  ## nsToMonitorRegex parameter supersedes nsToMonitor
-  ## Available at Cluster Agent v20.9+, Controller v20.10+
-  nsToMonitorRegex: kube-system|appdynamics|default
+  # nsToMonitorRegex parameter supersedes nsToMonitor
+  # Available at Cluster Agent v20.9+, Controller v20.10+
+  nsToMonitorRegex: appdynamics|appd-dotnet-agent|appd-java-agent
   ## Filter pods based on label or RegEx
   podFilter:
     blacklistedLabels:
-      - name: app-to-ignore
+      - name: label-app-to-ignore
     blacklistedNames:
-      - test-pod
+      - pod-name-to-ignore
     whitelistedNames:
-      - dotnet-app-init
+      - dotnet-app-to-include
+  # Logs
   logLevel: "INFO"
+  # Auto-instrumentation config
+  instrumentationMethod: Env
+  appNameStrategy: label
+  appNameLabel: name
+  nsToInstrumentRegex: appd-dotnet-agent|appd-java-agent
+  instrumentationRules:
+    - namespaceRegex: appd-dotnet-agent
+      appNameLabel: appName
+      language: dotnetcore
+      imageInfo:
+        image: "docker.io/appdynamics/dotnet-core-agent:latest"
+        agentMountPath: /opt/appdynamics
