@@ -39,14 +39,16 @@ Deploy Pods or Deployments, instrument with AppD agents using init containers (i
 ## a) Use pod to deploy the application with AppD agent
 ```
 oc apply -f dotnet-pod-init-cont.yml
-oc apply -f dotnet-pod-auto-instr.yml
 ```
+Note: Auto-instrumentation is available for Deployments only, for pods use init-containers.
 
 ## b) Use deployment
 ```
 oc apply -f dotnet-deployment-init-cont.yml
 oc apply -f dotnet-deployment-auto-instr.yml
 ```
+More on auto-instrumentation:
+https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications
 
 # Set namespaces to monitor
 
@@ -59,7 +61,7 @@ In the upper-right corner, click the Settings icon  > AppDynamics Agents.
 Select the Cluster Agents tab to display a list of clusters. Click Configure.
 Add or remove namespaces (projects)
 
-### b) using Cluster Agent configuration (preferred)
+### b) Using Cluster Agent configuration (preferred)
 
 "Modify the nsToMonitor field in the cluster-agent.yaml file before deploying the Cluster Agent. Namespaces mentioned in the nsToMonitor field are only considered during initial registration." [...] however nsToMonitorRegex field can be dynamically changed.
 https://docs.appdynamics.com/display/PRO45/Use+the+Cluster+Agent
