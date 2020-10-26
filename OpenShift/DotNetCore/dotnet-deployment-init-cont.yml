@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: appd-dotnet-agent
+  name: dotnet-app-deployment-init
 spec:
   selector:
     matchLabels:
-      app: appd-dotnet-agent
+      app: dotnet-app-deployment-init
   replicas: 1
   template:
     metadata:
       labels:
-        app: appd-dotnet-agent
+        app: dotnet-app-deployment-init
         tier: backend
         track: stable
     spec:
