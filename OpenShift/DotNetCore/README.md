@@ -5,7 +5,9 @@ oc new-project appd-dotnet-project
 ```
 
 # Execute namespace permission fix
-`permission-fix.sh`
+```
+permission-fix.sh
+```
 
 # Deploy secrets
 ```
@@ -59,7 +61,7 @@ In the upper-right corner, click the Settings icon  > AppDynamics Agents.
 Select the Cluster Agents tab to display a list of clusters. Click Configure.
 Add or remove namespaces (projects)
 
-### b) using Cluster Agent configuration (preferred)
+### b) Using Cluster Agent configuration (preferred)
 
 "Modify the nsToMonitor field in the cluster-agent.yaml file before deploying the Cluster Agent. Namespaces mentioned in the nsToMonitor field are only considered during initial registration." [...] however nsToMonitorRegex field can be dynamically changed.
 https://docs.appdynamics.com/display/PRO45/Use+the+Cluster+Agent
