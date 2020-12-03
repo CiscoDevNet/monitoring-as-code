@@ -96,7 +96,6 @@ sa well as Pods:
 oc apply -f dotnet-pod-init-cont.yml
 ```
 
-
 ## b) Use auto-instrumentation (recommended)
 
 With the Cluster Agent, you can auto-instrument containerized apps. Auto-instrumentation leverages Kubernetes init containers to instrument Kubernetes applications.
@@ -116,15 +115,13 @@ In this scenario, you only deploy an application in a usual manner, without need
 oc apply -f dotnet-deployment-auto-instr.yml
 ```
 
-Auto-instrumentation is then enabled by adding auto-instrumentation config section in `cluster-agent.yaml` file, for example:
+Auto-instrumentation is then enabled by adding auto-instrumentation config section in `cluster-agent.yaml` file, and Cluster Agent automatically and dynamically applies the configuration changes to all applications in the cluster. An example of cluster agent configuration:
 
 <img width="598" alt="Auto-Instrumentation Config Example" src="https://user-images.githubusercontent.com/23483887/101016659-02ccad00-3561-11eb-8217-f8cd217b6c88.png">
 
 Refer to our documentation for all of the auto-instrumentation parameters explained in detail [Auto-Instrumentation Parameters](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications).
 
-Cluster Agent automatically and dynamically applies the configuration changes to all applications in the cluster.
-
-[Cluster Agent Auto-Instrumentation Documentation](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications)
+Complete documentation about Cluster Agent auto-instrumentation can be found [here](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications).
 
 Note: Auto-instrumentation is available for Deployments only, for pods use init-containers.
 
@@ -151,6 +148,10 @@ Namespaces mentioned in the __nsToMonitor__ field are only considered during ini
 Alo, note that __nsToMonitorRegex__ parameter supersedes nsToMonitor. If you do not specify any value for this parameter, Cluster Agent uses the default value of __nsToMonitor__.
 
 To use the __nsToMonitorRegex__ field, ensure that you are using the Controller version 20.10 or later and the agent version 20.9 or later.
+
+An example of namespace and pod filters:
+
+<img width="601" alt="Namespaces to monitor" src="https://user-images.githubusercontent.com/23483887/101020373-4f66b700-3566-11eb-9e09-02ba98302bb1.png">
 
 More details can be found in the documentation [here](https://docs.appdynamics.com/display/PRO45/Use+the+Cluster+Agent).
 
