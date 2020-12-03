@@ -79,11 +79,11 @@ https://www.openshift.com/blog/managing-sccs-in-openshift
 # Deploy application
 Deploy Pods or Deployments, instrument with AppD agents using init containers (init-cont.yml) or auto-instrumentation (auto-instr.yml):
 
-## a).1 Use init containers
+## 1 Use init containers
 
 Init containers are an option available in Kubernetes environments to run additional containers at startup time that help initialize an application.
 
-Appdynamics provides APM agent images in the ![Docker Hub](https://hub.docker.com/u/appdynamics), and when used as init containers, can act as a delivery mechanism to copy the APM agent files into the application container at deploy time and then terminate.
+Appdynamics provides APM agent images in the [Docker Hub](https://hub.docker.com/u/appdynamics), and when used as init containers, can act as a delivery mechanism to copy the APM agent files into the application container at deploy time and then terminate.
 
 In the repo, examples of how to use init containers with Deployments:
 
@@ -97,16 +97,18 @@ oc apply -f dotnet-pod-init-cont.yml
 ```
 
 
-## b).1 Use auto-instrumentation (recomemnded)
+## 2 Use auto-instrumentation (recommended)
 
 With the Cluster Agent, you can auto-instrument containerized apps. Auto-instrumentation leverages Kubernetes init containers to instrument Kubernetes applications.
+
+Make sure to deploy Cluster Agent before proceeding with this approach.
 
 You can auto-instrument:
 - Node.js applications with the Node.js Agent
 - .NET Core on Linux application with the .NET Agent for Linux
 - Java applications with the Java Agent
 
-[!Requirements and Supported environments](https://docs.appdynamics.com/display/PRO45/Cluster+Agent+Requirements+and+Supported+Environments)
+[Requirements and Supported environments](https://docs.appdynamics.com/display/PRO45/Cluster+Agent+Requirements+and+Supported+Environments)
 
 In this scenario, you only deploy an application in a usual manner, without need to change any of the manifests, and the example is provided in the file below:
 
@@ -118,7 +120,7 @@ Auto-instrumentation is then enabled by adding auto-instrumentation config secti
 
 <img width="598" alt="Auto-Instrumentation Config Example" src="https://user-images.githubusercontent.com/23483887/101016659-02ccad00-3561-11eb-8217-f8cd217b6c88.png">
 
-Refer to our documentation for all of the auto-instrumentation parameters explained in detail [!Auto-Instrumentation Parameters](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications).
+Refer to our documentation for all of the auto-instrumentation parameters explained in detail [Auto-Instrumentation Parameters](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications).
 
 Cluster Agent automatically and dynamically applies the configuration changes to all applications in the cluster.
 
@@ -126,29 +128,33 @@ Cluster Agent automatically and dynamically applies the configuration changes to
 
 Note: Auto-instrumentation is available for Deployments only, for pods use init-containers.
 
-# b).2 Set namespaces to monitor
+# Set namespaces/projects to monitor
 
 ## Include-exclude namespaces
 
-There are two options available:
+When it comes to choosing which namespaces to monitor, there are two options available:
 
-### a) From the Controller UI panel
-In the upper-right corner, click the Settings icon  > AppDynamics Agents.
-Select the Cluster Agents tab to display a list of clusters. Click Configure.
-Add or remove namespaces (projects)
+### 1) From the Controller UI panel
+
+1) In the upper-right corner, click the Settings icon  > AppDynamics Agents.
+2) Select the Cluster Agents tab to display a list of clusters. Click Configure.
+3) Add or remove namespaces/projects
+
+![UI namespaces](https://user-images.githubusercontent.com/23483887/101017420-fb59d380-3561-11eb-94a0-63aaf830151f.png)
 
 
+### 2) Using Cluster Agent configuration (recommended)
 
-### b) Using Cluster Agent configuration (preferred)
+This is achieved by modifying the "nsToMonitor" and/or "nsToMonitorRegex" field in the `cluster-agent.yaml` file before deploying the Cluster Agent. 
+Namespaces mentioned in the "nsToMonitor" field are only considered during initial registration. However, "nsToMonitorRegex" field can be dynamically changed.
 
-"Modify the nsToMonitor field in the cluster-agent.yaml file before deploying the Cluster Agent. Namespaces mentioned in the nsToMonitor field are only considered during initial registration." [...] however nsToMonitorRegex field can be dynamically changed.
-https://docs.appdynamics.com/display/PRO45/Use+the+Cluster+Agent
-
-Note that 'nsToMonitorRegex' parameter supersedes nsToMonitor. If you do not specify any value for this parameter, Cluster Agent uses the default value of nsToMonitor.
+Alo, note that 'nsToMonitorRegex' parameter supersedes nsToMonitor. If you do not specify any value for this parameter, Cluster Agent uses the default value of nsToMonitor.
 
 To use the 'nsToMonitorRegex' field, ensure that you are using the Controller version 20.10 or later and the agent version 20.9 or later.
 
-## Namespace update common scenarios
+More details can be found in the documentation [here](https://docs.appdynamics.com/display/PRO45/Use+the+Cluster+Agent).
+
+#### Namespace update common scenarios
 
 The following are common namespace behavior scenarios with the nsToMonitor field:
 
@@ -157,23 +163,23 @@ The following are common namespace behavior scenarios with the nsToMonitor field
 - After initial registration, if the Controller restarts and the Cluster Agent is running, any previous change made to the namespaces in the Controller UI are preserved.
 - If both the Cluster Agent and the Controller restart, the namespaces are retrieved from the YAML file.
 
-https://docs.appdynamics.com/display/PRO45/Use+the+Cluster+Agent
+These scenarios are also covered in the documentation [here](https://docs.appdynamics.com/display/PRO45/Use+the+Cluster+Agent).
 
-# Instrument application and correlate APM agents with Cluster Agent
+# Correlate APM agents with Cluster Agent
 
-There are two main options to consider:
+Correlation of APM agents and Cluster Agent depend on deployment techniquie previously chosen in Deploy application.
 
 ## Init containers
+
+Note: To be used with Java applications only.
+
 When init container is used, UNIQUE_HOST_ID can be set in order to correlate APM agent and cluster agent metrics:
 https://docs.appdynamics.com/display/PRO45/Configure+App+Agents+to+Correlate+with+Cluster+Agent
 
-To be used with Java applications only.
-
-## Auto-instrumentation (preferred)
+## Auto-instrumentation (recommended)
 
 Without need to use init containers, auto-instrumentation can be used to inject agent and correlate APM with cluster agent.
 
-Make sure to deploy Cluster Agent resources before proceeding with this approach.
 
 Note the following limitation:
 "If your Controller is using a self-signed certificate, only auto-instrumentation for Java applications is supported."
