@@ -1,13 +1,35 @@
 
 # Create project
+
 ```
 oc new-project appd-dotnet-project
 ```
 
+![Projects](https://user-images.githubusercontent.com/23483887/101011897-a23a7180-355a-11eb-923c-764cf2a5792a.png)
+
+
 # Execute namespace permission fix
-`permission-fix.sh`
+
+You either need to give the service account anyuid SCC or change the uid range for the project (appdynamics) to include 1001
+``` 
+./permission-fix.sh
+```
+In platforms such as Kubernetes and OpenShift this will be the equivalent as allowing UID 0, or root user, both inside and outside the container.
+https://www.openshift.com/blog/managing-sccs-in-openshift
 
 # Deploy secrets
+
+Provide value of account-access-key as base64 encoded string, and apply the secrets file.
+
+To encode a secret:
+```
+echo -n "plain-text-secret-value-here" | base64
+```
+To decode:
+```
+echo "base64-encoded-secret-here" | base64 -d
+```
+To apply:
 ```
 oc apply -f dotnet-appd-secrets.yaml
 ```
