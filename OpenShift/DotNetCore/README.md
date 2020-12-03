@@ -1,7 +1,7 @@
 
 # 1. Preparation steps for application and APM agent deployment
 
-## Create project
+## Create a project
 
 ```
 oc new-project appd-dotnet-project
@@ -16,12 +16,12 @@ You either need to give the service account anyuid SCC or change the uid range f
 ``` 
 ./permission-fix.sh
 ```
-In platforms such as Kubernetes and OpenShift this will be the equivalent as allowing UID 0, or root user, both inside and outside the container.
+In platforms such as Kubernetes and OpenShift this will be the equivalent of allowing UID 0, or root user, both inside and outside the container.
 https://www.openshift.com/blog/managing-sccs-in-openshift
 
 ## Deploy secrets
 
-Provide value of account-access-key as base64 encoded string, and apply the secrets file.
+Provide the value of account-access-key as base64 encoded string, and apply the secrets file.
 
 To encode a secret:
 ```
@@ -36,7 +36,7 @@ To apply:
 oc apply -f dotnet-appd-secrets.yaml
 ```
 
-If created successfully, secret ig going to be visible in the OpenShift project resources as well:
+If created successfully, secret is going to be visible in the OpenShift project resources as well:
 ![Secrets](https://user-images.githubusercontent.com/23483887/101013432-2e00cd80-355c-11eb-9cf9-2a87fb884a76.png)
 
 ## Deploy ConfigMap
@@ -62,7 +62,7 @@ You should be seeing created ConfigMap in resources:
 A service account provides an identity for processes that run in a Pod. 
 https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 
-Create service account:
+Create a service account:
 ```
 oc create sa appd-account
 ```
@@ -109,7 +109,7 @@ You can auto-instrument:
 
 [Requirements and Supported environments](https://docs.appdynamics.com/display/PRO45/Cluster+Agent+Requirements+and+Supported+Environments)
 
-In this scenario, you only deploy an application in a usual manner, without need to change any of the manifests, and the example is provided in the file below:
+In this scenario, you only deploy an application in a usual manner, without the need to change any of the manifests, and the example is provided in the file below:
 
 ```
 oc apply -f dotnet-deployment-auto-instr.yml
@@ -145,7 +145,7 @@ When it comes to choosing which namespaces to monitor, there are two options ava
 This is achieved by modifying the __nsToMonitor__ and/or __nsToMonitorRegex__ field in the `cluster-agent.yaml` file before deploying the Cluster Agent. 
 Namespaces mentioned in the __nsToMonitor__ field are only considered during initial registration. However, __nsToMonitorRegex__ field can be dynamically changed.
 
-Alo, note that __nsToMonitorRegex__ parameter supersedes nsToMonitor. If you do not specify any value for this parameter, Cluster Agent uses the default value of __nsToMonitor__.
+Also, note that __nsToMonitorRegex__ parameter supersedes nsToMonitor. If you do not specify any value for this parameter, Cluster Agent uses the default value of __nsToMonitor__.
 
 To use the __nsToMonitorRegex__ field, ensure that you are using the Controller version 20.10 or later and the agent version 20.9 or later.
 
@@ -161,16 +161,16 @@ The following are common namespace behavior scenarios with the __nsToMonitor__ f
 
 - After the Cluster Agent's initial registration, the namespaces are retrieved from the Cluster Agent YAML file.
 - After initial registration, if the Cluster Agent restarts and the Controller is running, the Controller UI's user namespace settings take precedence.
-- After initial registration, if the Controller restarts and the Cluster Agent is running, any previous change made to the namespaces in the Controller UI are preserved.
+- After initial registration, if the Controller restarts and the Cluster Agent is running, any previous changes made to the namespaces in the Controller UI are preserved.
 - If both the Cluster Agent and the Controller restart, the namespaces are retrieved from the YAML file.
 
 These scenarios are also covered in the documentation [here](https://docs.appdynamics.com/display/PRO45/Use+the+Cluster+Agent).
 
 # 4. Correlate APM agents with Cluster Agent
 
-Correlation of APM agents and Cluster Agent depend on deployment techniquie previously chosen in [Deploy application](https://github.com/Appdynamics/monitoring-as-code/tree/features/openshift/OpenShift/DotNetCore#deploy-application) section.
+Correlation of APM agents and Cluster Agent depends on deployment techniquie previously chosen in [Deploy application](https://github.com/Appdynamics/monitoring-as-code/tree/features/openshift/OpenShift/DotNetCore#deploy-application) section.
 
-It enables a direct link between Cluster agent monitored Pod and APM application in AppDynamics Applications. When successflull, a link similar to this appears in Cluster Agent view:
+It enables a direct link between Cluster agent monitored Pod and APM application in AppDynamics Applications. When successful, a link similar to this appears in Cluster Agent view:
 
 ![APM Correlation](https://user-images.githubusercontent.com/23483887/101019373-c8fda580-3564-11eb-8add-de67358eae6e.png)
 
@@ -179,11 +179,11 @@ It enables a direct link between Cluster agent monitored Pod and APM application
 Note: This correlation technique can be used with Java applications only.
 
 When init container is used, UNIQUE_HOST_ID can be set in order to correlate APM agent and cluster agent metrics.
-Depending on your version, command that needs to be executed varies, and for the latest infoamtion on this refer to the documentation [here](https://docs.appdynamics.com/display/PRO45/Configure+App+Agents+to+Correlate+with+Cluster+Agent).
+Depending on your version, the command that needs to be executed varies, and for the latest infoamtion on this refer to the documentation [here](https://docs.appdynamics.com/display/PRO45/Configure+App+Agents+to+Correlate+with+Cluster+Agent).
 
 ## b) When you are using auto-instrumentation (recommended)
 
-Without need to use init containers, auto-instrumentation can be used to inject agent and correlate APM with cluster agent.
+Without the need to use init containers, auto-instrumentation can be used to inject agent and correlate APM with cluster agent.
 
 No additional actions are required in order to enable correlation.
 
