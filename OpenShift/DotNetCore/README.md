@@ -1,5 +1,7 @@
 
-# Create project
+# Preparation steps for application and APM agent deployment
+
+## Create project
 
 ```
 oc new-project appd-dotnet-project
@@ -8,7 +10,7 @@ oc new-project appd-dotnet-project
 ![Projects](https://user-images.githubusercontent.com/23483887/101011897-a23a7180-355a-11eb-923c-764cf2a5792a.png)
 
 
-# Execute namespace permission fix
+### Execute namespace permission fix
 
 You either need to give the service account anyuid SCC or change the uid range for the project (appdynamics) to include 1001
 ``` 
@@ -17,7 +19,7 @@ You either need to give the service account anyuid SCC or change the uid range f
 In platforms such as Kubernetes and OpenShift this will be the equivalent as allowing UID 0, or root user, both inside and outside the container.
 https://www.openshift.com/blog/managing-sccs-in-openshift
 
-# Deploy secrets
+## Deploy secrets
 
 Provide value of account-access-key as base64 encoded string, and apply the secrets file.
 
@@ -34,12 +36,31 @@ To apply:
 oc apply -f dotnet-appd-secrets.yaml
 ```
 
-# Deploy ConfigMap
+If created successfully, secret ig going to be visible in the OpenShift project resources as well:
+![Secrets](https://user-images.githubusercontent.com/23483887/101013432-2e00cd80-355c-11eb-9cf9-2a87fb884a76.png)
+
+## Deploy ConfigMap
+
+A ConfigMap is an API object used to store non-confidential data in key-value pairs. Pods can consume ConfigMaps as environment variables, command-line arguments, or as configuration files in a volume.
+
+A ConfigMap allows you to decouple environment-specific configuration from your container images, so that your applications are easily portable.
+
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
+
+Provide environment variable values in plaintext format and apply to a cluster.
+
 ```
 oc apply -f dotnet-config-map.yaml
 ```
 
-# Service account
+You should be seeing created ConfigMap in resources:
+
+![ConfigMap](https://user-images.githubusercontent.com/23483887/101013219-da8e7f80-355b-11eb-923d-93d87c5f9f8b.png)
+
+## Service account
+
+A service account provides an identity for processes that run in a Pod. 
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 
 Create service account:
 ```
@@ -58,21 +79,54 @@ https://www.openshift.com/blog/managing-sccs-in-openshift
 # Deploy application
 Deploy Pods or Deployments, instrument with AppD agents using init containers (init-cont.yml) or auto-instrumentation (auto-instr.yml):
 
-## a) Use pod to deploy the application with AppD agent
+## a).1 Use init containers
+
+Init containers are an option available in Kubernetes environments to run additional containers at startup time that help initialize an application.
+
+Appdynamics provides APM agent images in the ![Docker Hub](https://hub.docker.com/u/appdynamics), and when used as init containers, can act as a delivery mechanism to copy the APM agent files into the application container at deploy time and then terminate.
+
+In the repo, examples of how to use init containers with Deployments:
+
+```
+oc apply -f dotnet-deployment-init-cont.yml
+```
+sa well as Pods:
+
 ```
 oc apply -f dotnet-pod-init-cont.yml
 ```
-Note: Auto-instrumentation is available for Deployments only, for pods use init-containers.
 
-## b) Use deployment
+
+## b).1 Use auto-instrumentation (recomemnded)
+
+With the Cluster Agent, you can auto-instrument containerized apps. Auto-instrumentation leverages Kubernetes init containers to instrument Kubernetes applications.
+
+You can auto-instrument:
+- Node.js applications with the Node.js Agent
+- .NET Core on Linux application with the .NET Agent for Linux
+- Java applications with the Java Agent
+
+[!Requirements and Supported environments](https://docs.appdynamics.com/display/PRO45/Cluster+Agent+Requirements+and+Supported+Environments)
+
+In this scenario, you only deploy an application in a usual manner, without need to change any of the manifests, and the example is provided in the file below:
+
 ```
-oc apply -f dotnet-deployment-init-cont.yml
 oc apply -f dotnet-deployment-auto-instr.yml
 ```
-More on auto-instrumentation:
-https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications
 
-# Set namespaces to monitor
+Auto-instrumentation is then enabled by adding auto-instrumentation config section in `cluster-agent.yaml` file, for example:
+
+<img width="598" alt="Auto-Instrumentation Config Example" src="https://user-images.githubusercontent.com/23483887/101016659-02ccad00-3561-11eb-8217-f8cd217b6c88.png">
+
+Refer to our documentation for all of the auto-instrumentation parameters explained in detail [!Auto-Instrumentation Parameters](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications).
+
+Cluster Agent automatically and dynamically applies the configuration changes to all applications in the cluster.
+
+[!Cluster Agent Auto-Instrumentation Dcoumentation](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications)
+
+Note: Auto-instrumentation is available for Deployments only, for pods use init-containers.
+
+# b).2 Set namespaces to monitor
 
 ## Include-exclude namespaces
 
@@ -82,6 +136,8 @@ There are two options available:
 In the upper-right corner, click the Settings icon  > AppDynamics Agents.
 Select the Cluster Agents tab to display a list of clusters. Click Configure.
 Add or remove namespaces (projects)
+
+
 
 ### b) Using Cluster Agent configuration (preferred)
 
