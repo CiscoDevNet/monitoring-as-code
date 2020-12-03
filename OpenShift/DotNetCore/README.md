@@ -19,6 +19,12 @@ You either need to give the service account anyuid SCC or change the uid range f
 In platforms such as Kubernetes and OpenShift this will be the equivalent of allowing UID 0, or root user, both inside and outside the container.
 https://www.openshift.com/blog/managing-sccs-in-openshift
 
+In case that project is still not visible from the OpenShift console,  add your currrent user (alice below) to project admins, for example:
+
+```
+oc adm policy add-role-to-user admin alice -n appd-dotnet-project
+```
+
 ## Deploy secrets
 
 Provide the value of account-access-key as base64 encoded string, and apply the secrets file.
