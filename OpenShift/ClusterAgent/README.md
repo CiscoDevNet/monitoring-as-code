@@ -124,15 +124,15 @@ oc apply -f cluster-agent.yaml
 
 ### Validate
 
-if everything run as expected, you should be seeing Cluster Agent under the Servers > Clusters menu,
+If everything run as expected, you should be seeing Cluster Agent under the Servers > Clusters menu:
 
 ![cluster-agent-servers](https://user-images.githubusercontent.com/23483887/101352639-60773700-388a-11eb-86bb-3f10a16300b7.png)
 
-access the dahboard,
+Here, you can access the dahboard for each monitored cluster:
 
 ![cluster-agent-dash](https://user-images.githubusercontent.com/23483887/101352708-771d8e00-388a-11eb-8f99-586ccf0cb939.png)
 
-and pods
+Also, resources created are going to be visible in the console:
 
 ![cluster-agent-pods](https://user-images.githubusercontent.com/23483887/101352656-6836db80-388a-11eb-83d8-4592a017ed70.png)
 
