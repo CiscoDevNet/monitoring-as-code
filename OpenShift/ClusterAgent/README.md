@@ -17,6 +17,17 @@ This is an excerpt from our documentation:
 https://docs.appdynamics.com/display/PRO45/Deploy+the+AppDynamics+Operator+on+Red+Hat+OpenShift
 
 # 2. Preparation steps
+
+## Verify the environment
+
+Before starting the installation, verify that you have:
+
+- kubectl version 1.11.3 or later
+- Access to a Kubernetes cluster version 1.14 or later
+- AppDynamics Controller versions 20.3.0 and later, and configured the Controller Settings for the Cluster Agent
+
+Refer to the [documentation](https://docs.appdynamics.com/display/PRO45/Cluster+Agent+Requirements+and+Supported+Environments) for a full list of supported environments.
+
 ## Start OpenShift cluster
 ```
 oc cluster up --public-hostname=<host-name>
@@ -82,7 +93,7 @@ In order not to get perission denied when creating a cluster agent resource, as 
 
 ## User rights
 
-Make sure user has rights to perform updates on the cluster
+Make sure user has rights to perform updates on the cluster:
 
 ```
 oc adm policy add-role-to-user <role> <user>
@@ -91,7 +102,7 @@ e.g.
 ```
 oc adm policy add-role-to-user admin system
 ```
-
+    
 # 3. Deploy Cluster Agent
 
 ## Create operator
@@ -109,6 +120,8 @@ After deploying an operator (kubectl apply), in order to configure a Cluster age
 ```
 oc apply -f cluster-agent-operator-openshift.yaml
 ```
+
+Documentation about how to deploy an Operator can be found [here](https://docs.appdynamics.com/display/PRO45/Deploy+the+AppDynamics+Operator+on+Kubernetes).
 
 ## Configure and deploy cluster agent
 
