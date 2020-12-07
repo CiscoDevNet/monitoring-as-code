@@ -7,7 +7,7 @@
 oc new-project java-project
 ```
 
-![Projects](https://user-images.githubusercontent.com/23483887/101011897-a23a7180-355a-11eb-923c-764cf2a5792a.png)
+![java-project](https://user-images.githubusercontent.com/23483887/101358199-6a049d00-3892-11eb-92f7-72a019f1bdba.png)
 
 
 ### Execute namespace permission fix
@@ -43,7 +43,7 @@ oc apply -f dotnet-appd-secrets.yaml
 ```
 
 If created successfully, secret is going to be visible in the OpenShift project resources as well:
-![Secrets](https://user-images.githubusercontent.com/23483887/101013432-2e00cd80-355c-11eb-9cf9-2a87fb884a76.png)
+![java-secret](https://user-images.githubusercontent.com/23483887/101352557-3de51e00-388a-11eb-8701-ac0931379822.png)
 
 ## Deploy ConfigMap
 
@@ -61,7 +61,7 @@ oc apply -f dotnet-config-map.yaml
 
 You should be seeing created ConfigMap in resources:
 
-![ConfigMap](https://user-images.githubusercontent.com/23483887/101013219-da8e7f80-355b-11eb-923d-93d87c5f9f8b.png)
+![java-config](https://user-images.githubusercontent.com/23483887/101352544-3887d380-388a-11eb-84f2-17c8d48f195d.png)
 
 ## Service account
 
@@ -85,7 +85,7 @@ https://www.openshift.com/blog/managing-sccs-in-openshift
 # 2. Deploy application
 Deploy Pods or Deployments, instrument with AppD agents using init containers (init-cont.yml) or auto-instrumentation (auto-instr.yml):
 
-## a) Use init containers
+## a) Use init containers (OpenShift 3.x version)
 
 Init containers are an option available in Kubernetes environments to run additional containers at startup time that help initialize an application.
 
@@ -94,15 +94,14 @@ Appdynamics provides APM agent images in the [Docker Hub](https://hub.docker.com
 In the repo, examples of how to use init containers with Deployments:
 
 ```
-oc apply -f dotnet-deployment-init-cont.yml
-```
-sa well as Pods:
-
-```
-oc apply -f dotnet-pod-init-cont.yml
+oc apply -f java-deployment-init-cont.yml
 ```
 
-## b) Use auto-instrumentation (recommended)
+Note that UNIQUE_HOST_ID is used to correlate APM agent and Cluster agent metrics.
+Java Cluster Agent correlation documentation can be found [here](https://docs.appdynamics.com/display/PRO45/Configure+App+Agents+to+Correlate+with+Cluster+Agent).
+
+
+## b) Use auto-instrumentation (recommended, OpenShift 4.x version)
 
 With the Cluster Agent, you can auto-instrument containerized apps. Auto-instrumentation leverages Kubernetes init containers to instrument Kubernetes applications.
 
@@ -118,12 +117,12 @@ You can auto-instrument:
 In this scenario, you only deploy an application in a usual manner, without the need to change any of the manifests, and the example is provided in the file below:
 
 ```
-oc apply -f dotnet-deployment-auto-instr.yml
+oc apply -f java-deployment-auto-instr.yml
 ```
 
 Auto-instrumentation is then enabled by adding auto-instrumentation config section in `cluster-agent.yaml` file, and Cluster Agent automatically and dynamically applies the configuration changes to all applications in the cluster. An example of cluster agent configuration:
 
-<img width="598" alt="Auto-Instrumentation Config Example" src="https://user-images.githubusercontent.com/23483887/101016659-02ccad00-3561-11eb-8217-f8cd217b6c88.png">
+<img width="716" alt="java-auto-instr-config" src="https://user-images.githubusercontent.com/23483887/101358664-147cc000-3893-11eb-9828-a94885403269.png">
 
 Refer to our documentation for all of the auto-instrumentation parameters explained in detail [Auto-Instrumentation Parameters](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications).
 
@@ -178,7 +177,7 @@ Correlation of APM agents and Cluster Agent depends on deployment techniquie pre
 
 It enables a direct link between Cluster agent monitored Pod and APM application in AppDynamics Applications. When successful, a link similar to this appears in Cluster Agent view:
 
-![APM Correlation](https://user-images.githubusercontent.com/23483887/101019373-c8fda580-3564-11eb-8add-de67358eae6e.png)
+![java-pod](https://user-images.githubusercontent.com/23483887/101352608-548b7500-388a-11eb-8d05-6f21e31ff18b.png)
 
 ## a) When you are using init containers
 
