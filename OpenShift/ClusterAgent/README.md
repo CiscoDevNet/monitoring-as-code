@@ -178,12 +178,12 @@ The following are common namespace behavior scenarios with the __nsToMonitor__ f
 These scenarios are also covered in the documentation [here](https://docs.appdynamics.com/display/PRO45/Use+the+Cluster+Agent).
 
 
-# 5. Additional resources
+# 5. Examples
 
-GitHub repo with examples ia also available, and can be found [here](https://github.com/Appdynamics/appdynamics-operator#clusteragent-deployment).
+GitHub repo with additional resources ia also available, and can be found [here](https://github.com/Appdynamics/appdynamics-operator#clusteragent-deployment).
 
 
-## 6. Infrastructure visibility
+# 6. Infrastructure visibility
 
 I order to monitor nodes, infrastructure visibility can be deployed to instrument each machine. 
 This is not an recommended approach as it can consume additional resources and monitoring should be based on cluster events and pod monitoring, however, if needed, deploy infrastructure visibility agent:
