@@ -66,6 +66,8 @@ Additional secret is needed in case when auto-instrumentation is used.  The `api
 secret-auto-instrumentation.sh
 ```
 
+![cluster-agent-secret](https://user-images.githubusercontent.com/23483887/101352766-88ff3100-388a-11eb-8ec3-0cbef4f5299a.png)
+
 Documentation about these secret values can be found in the documentation [here](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications#EnableAuto-InstrumentationofSupportedApplications-enable).
 
 ## Execute permission fix
