@@ -193,7 +193,7 @@ The following are common namespace behavior scenarios with the __nsToMonitor__ f
 These scenarios are also covered in the documentation [here](https://docs.appdynamics.com/display/PRO45/Use+the+Cluster+Agent).
 
 
-# 5. Examples
+# 5. Additional resources
 
 GitHub repo with additional resources ia also available, and can be found [here](https://github.com/Appdynamics/appdynamics-operator#clusteragent-deployment).
 
