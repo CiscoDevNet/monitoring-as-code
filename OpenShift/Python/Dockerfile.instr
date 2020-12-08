@@ -1,0 +1,13 @@
+FROM python:3.6
+
+COPY /python-flask-docker /app
+WORKDIR /app
+
+RUN pip install -r requirements.txt
+RUN pip install -U appdynamics==20.11.0.2783
+
+RUN mkdir /opt/appdynamics/
+COPY agent.cfg /opt/appdynamics/agent.cfg
+
+EXPOSE 8080
+ENTRYPOINT ["pyagent", "run",  "-c",  "/opt/appdynamics/agent.cfg", "python", "app/app.py"]
