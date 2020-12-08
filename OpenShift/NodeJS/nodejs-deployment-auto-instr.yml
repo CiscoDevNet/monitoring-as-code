@@ -14,10 +14,10 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: appd-nodejs-deployment-auto
+  name: nodejs-app
   labels:
-    appName: NodeJS-Deployment-Auto-App
-    name: appd-nodejs-deployment-auto
+    appName: NodeJS-Deployment-App
+    name: appd-nodejs-deployment
 spec:
   selector:
     matchLabels:
@@ -26,22 +26,21 @@ spec:
   template:
     metadata:
       labels:
+        name: nodejs-app
         app: appd-nodejs-deployment-auto
         tier: backend
     spec:
-      nodeSelector:
-        kubernetes.io/os: linux
       containers:
         - name: nodejs-app
           image: sashaz/openmct:v1
-          imagePullPolicy: "IfNotPresent"
+          imagePullPolicy: IfNotPresent
           resources:
             limits:
-              cpu: 200m
-              memory: 500M
-            requests:
               cpu: 100m
-              memory: 300M
+              memory: 100M
+            requests:
+              cpu: 50m
+              memory: 100M   
           ports:
           - containerPort: 8080
           envFrom:
