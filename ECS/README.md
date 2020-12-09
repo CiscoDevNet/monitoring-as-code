@@ -1,12 +1,12 @@
 # CloudFormation Templates for Elastic Container Service (ECS)
 
-The following guide provides information and reference to additional documentation about steps needed to provision application and AppDynamics agents in Serverless ECS Fargate environment by utilizing AWS CloudFormation templates.
+The following guide provides information and reference to additional documentation about steps to create Task definition and resources needed to define application and AppDynamics agents in Serverless ECS Fargate environment by utilizing AWS CloudFormation templates.
 
 Screenshots are taken for the .NET Core application Stack, however, the same applies to other languages.
 
 ## What is ECS?
 
-Amazon ECS is a regional service that simplifies running containers in a highly available manner across multiple Availability Zones within a Region. You can create Amazon ECS clusters within a new or existing VPC. After a cluster is up and running, you can create task definitions that define which container images to run across your clusters. Your task definitions are used to run tasks or create services. Container images are stored in and pulled from container registries, for example Amazon Elastic Container Registry. [learn more](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html)
+Amazon ECS is a regional service that simplifies running containers in a highly available manner across multiple Availability Zones within a Region. You can create Amazon ECS clusters within a new or existing VPC. After a cluster is up and running, you can create task definitions that define which container images to run across your clusters. Your task definitions are used to run tasks or create services. Container images are stored in and pulled from container registries, for example, Amazon Elastic Container Registry. [learn more](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html)
 
 ### ECS Terminology
 
@@ -37,9 +37,9 @@ To declare Task Definition entity in CloudFormation json or yaml files can be us
 
 ### Create Secrets
 
-We are using AWS Secret Manager as secrets management service, where we are storing AppDynamics Controller's access key.
+We are using AWS Secret Manager as a secrets management service, where we are storing AppDynamics Controller's access key.
 
-Store the value as a plaintext, without quotes, as that is going to be value of our environment variable.
+Store the value as plaintext, without quotes, as that is going to be a value of our environment variable.
 
 ![aws-secret-create](https://user-images.githubusercontent.com/23483887/101659141-a294aa00-3a3d-11eb-8890-45de5af81174.png)
 
@@ -53,7 +53,7 @@ Keep note of the *Secret ARN* created as we are going to need this value later o
 
 ### Create Log Group (optional)
 
-In case that all of the logs produced in specific ECS environment, you would like to keep under a single Log Group in CloudWatch, follow the next steps. Also, you may reuse existing Log Group if applicable.
+In case that all of the logs are produced in a specific ECS environment, you would like to keep under a single Log Group in CloudWatch, follow the next steps. Also, you may reuse an existing Log Group if applicable.
 
 A log group is a group of log streams that share the same retention, monitoring, and access control settings. More about Log Groups and Log Streams can also be found [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html).
 
@@ -67,7 +67,7 @@ You manage access in AWS by creating policies and attaching them to IAM identiti
 
 Policies are JSON documents in AWS that, when attached to an identity or resource, define their permissions. This is how all the requests in AWS are authorized (answers the question: do I have permissions?, while authentication is a process of verifying the identity of a person or device e.g. when you sign in with your username and password).
 
-We are going to be need to be allowed to fetch the created secret, and in case that we already do not have a IAM role ready for a CloudFormation stack, we are going to need to create a policy to attach to it's IAM Role. 
+We are going to need to be allowed to fetch the created secret, and in case that we already do not have an IAM role ready for a CloudFormation stack, we are going to need to create a policy to attach to its IAM Role. 
 
 An IAM role is an IAM identity that you can create in your account that has specific permissions. More about IAM Roles can be found [here](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html).
 
@@ -77,13 +77,13 @@ In order to be able to enable APM agent to get created secrets' value, we need t
 
 The following policy document `get-secrets-policy.json`, can be added to your AWS account manually through AWS Console (IAM > Policies > Create Policy), or by using AWS CLI and executing a script `get-secrets-policy-create.sh`.
 
-Please note that the Resource element's value need sot be updated with your account's Secret ARN (make sure that region and account number are correct), and in case that you are using CLI, it need to be configured - AWS [documentation](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) provides step-by-step guide on how to do that.
+Please note that the Resource element's value need sot be updated with your account's Secret ARN (make sure that region and account number are correct), and in case that you are using CLI, it needs to be configured - AWS [documentation](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) provides step-by-step guidance on how to do that.
 
 Upon successful creation, take a note of *Secret Policy ARN* and proceed to the next steps. This value is going to be returned in the API response in case you used AWS CLI, or can be found in AWS Console in IAM > Policies > [select policy] > [copy Policy ARN].
 
 #### CloudFormation Policy and Role
 
-In order to assign permissions, following least-privilege principle, in `cloud-formation-policy.json` file a policy is defined that needs at least to be assigned to a CloudFormation role in order for it to be able to create, delete, get and modify resources for the purpose of deploying desired applications and their dependencies.
+In order to assign permissions, following the least-privilege principle, in `cloud-formation-policy.json` file a policy is defined that needs at least to be assigned to a CloudFormation role in order for it to be able to create, delete, get and modify resources to deploy desired applications and their dependencies.
 
 Create a policy, manually in AWS Console (IAM > Policies > Create Policy) or using an AWS CLI (file `cloud-formation-policy-create.sh`).
 
@@ -93,9 +93,9 @@ Attach the policy to an existing CloudFormation role (IAM > Roles > [select role
 
 CloudFormation template can be found in the following file: `CF_TaskDefinition_ECSFargate_DotNetCore.yaml`.
 
-Example application provided in the template is ready to go and provision Microsoft .NET Core application (configurable in next step) alongside with AppDynamics agent in ECS as a AWS Serverless Fargate resource, and here before creating a stack you can review and update non-parametrized fields.
+Example application provided in the template is ready to go and provision Microsoft .NET Core application (configurable in next step) alongside with AppDynamics agent in ECS as an AWS Serverless Fargate resource, and here before creating a stack you can review and update non-parametrized fields.
 
-In this step, remove `LogGroup` in case that CloudWatch Log Groups are not to be used before proceeding to next steps.
+In this step, remove `LogGroup` in case that CloudWatch Log Groups are not to be used before proceeding to the next steps.
 
 Learn more about [Task definition properties](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecs-taskdefinition.html).
 
@@ -122,7 +122,7 @@ In the next step, make sure to assign an IAM Role that has enough permissions to
 
 ![CloudFormation-Role](https://user-images.githubusercontent.com/23483887/101676585-43da2b00-3a53-11eb-8449-65964d507dd3.png)
 
-Acknowledge that CloudFormation can create resources from the template on your behalf (note that those are not limited to provisioning services, but also creating roles, users and policies), and create a Stack.
+Acknowledge that CloudFormation can create resources from the template on your behalf (note that those are not limited to provisioning services, but also creating roles, users, and policies), and create a Stack.
 
 ![CloudFormation-AckAndCreate](https://user-images.githubusercontent.com/23483887/101676206-c6161f80-3a52-11eb-9443-5617175429d5.png)
 
@@ -147,10 +147,10 @@ Configure Service parameters:
 - Cluster - pick a cluster from a drop-down,
 - Service name - good practice is to be `ApplicationServiceName` + Service,
 - Number of tasks - number of times to spin an application, can be 1,
-- Cluster VPC - Virtual Private Cloud where the service is going to run, can be default for testing purposes,
+- Cluster VPC - Virtual Private Cloud where the service is going to run, can be the default for testing purposes,
 - Auto-assign public IP - Enabled -in case that your application needs to have an accessible IP address.
 
-Create a Service and take a note of the Security Group in case that application ports needs to be open and Security Group Inbound rules needs to be added.
+Create a Service and take note of the Security Group in case that application ports need to be open and Security Group Inbound rules to be added.
 
 
 
