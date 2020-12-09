@@ -13,8 +13,7 @@ Option 3 is the recommended approach for three main reasons:
 This is an excerpt from our documentation: 
 “AppDynamics recommends auto-instrumentation of containers because it provides the simplest operational experience. However, if you cannot use auto-instrumentation, you should use init containers to copy agent files to simplify the agent upgrade and promote separation of concerns. For non-Kubernetes environments, Dockerfiles is the best option to use when copying the agent files at build time.”
 
-
-https://docs.appdynamics.com/display/PRO45/Deploy+the+AppDynamics+Operator+on+Red+Hat+OpenShift
+Follow [this](https://docs.appdynamics.com/display/PRO45/Deploy+the+AppDynamics+Operator+on+Red+Hat+OpenShift) link to navigate to OpenShift-specific Cluster Agent documentation.
 
 # 2. Preparation steps
 
