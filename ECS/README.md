@@ -105,28 +105,36 @@ Navigate to CloudFormation Service and create a Stack, pick an option to do so f
 
 ![CloudFormation-CreateStack](https://user-images.githubusercontent.com/23483887/101669603-1341c380-3a4a-11eb-947c-4c540032391e.png)
 
-In the next step give Stack a name, and update parameters, besides controller connection details, make sure to update the following fields:
-- `AppDSecretAccessKey` - value should be *Secret ARN* 
-- `PolicyGetSecrets` - value should be *Secret Policy ARN*
-- `LogGroup`, `LogPrefix`, `LogRegion` - CloudWatch Log Group details
-
-Note that `ApplicationServiceName` is going to determine your task definition name, so 
-
-![CloudFormation-ParametersUpdate](https://user-images.githubusercontent.com/23483887/101671933-1ab69c00-3a4d-11eb-92a9-0be9fa28f2d3.png)
-
 To name the stack, provide intuitive naming at the top of the screen:
 
 ![CloudFormation-NameStack](https://user-images.githubusercontent.com/23483887/101670344-f1950c00-3a4a-11eb-9213-9780fdb39454.png)
 
+In the same step, update parameters, besides controller connection details, make sure to update the following fields:
+- `AppDSecretAccessKey` - value should be *Secret ARN* 
+- `PolicyGetSecrets` - value should be *Secret Policy ARN*
+- `LogGroup`, `LogPrefix`, `LogRegion` - CloudWatch Log Group details
+
+![CloudFormation-Parameters](https://user-images.githubusercontent.com/23483887/101676355-f8c01800-3a52-11eb-84f9-07ba9a91c999.png)
+
+Here, note that `ApplicationServiceName` is going to determine your Task definition name, so set it accordingly, and bear in mind that to this name "TaskDefinition" string is going to be appended at the end to form a Task definition name.
+
 In the next step, make sure to assign an IAM Role that has enough permissions to create template resources (refer to CloudFormation Policy and Role):
 
-![CloudFormation-Role](https://user-images.githubusercontent.com/23483887/101670678-610afb80-3a4b-11eb-9433-24b5c00b2294.png)
+![CloudFormation-Role](https://user-images.githubusercontent.com/23483887/101676585-43da2b00-3a53-11eb-8449-65964d507dd3.png)
 
 Acknowledge that CloudFormation can create resources from the template on your behalf (note that those are not limited to provisioning services, but also creating roles, users and policies), and create a Stack.
 
+![CloudFormation-AckAndCreate](https://user-images.githubusercontent.com/23483887/101676206-c6161f80-3a52-11eb-9443-5617175429d5.png)
+
+Stack Events can be observed and when status changes to UPDATE_COMPLETED, proceed to the next section.
+
+![CloudFormation-Created](https://user-images.githubusercontent.com/23483887/101676729-771cba00-3a53-11eb-83e2-4150293adc32.png)
+
 ## Observe Created Resources
 
+
 Navigate to Elastic Container Service (ECS) > Task Definitions in AWS Console, and find a Task named as `ApplicationServiceName` + TaskDefinition of the used Stack. 
+
 "Task definitions specify the container information for your application, such as how many containers are part of your task, what resources they will use, how they are linked together, and which host ports they will use." [learn more](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html)
 
 Create an ECS cluster there if there are no suitable ones already, by selecting Clusters from the left-hand side menu > Create Cluster > Networking Only > [provide name].
