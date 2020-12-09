@@ -48,7 +48,24 @@ In this project as an underlying application we used Python app utilizing Flask 
 
 With python agent, you can 1) build an image that is going to contain Appdynamics package, or 2) use an existing image but override entrypoint command. In the section below, we'll cover both scenarios.
 
-# Deploying an agent
+For any of the scenarios, bear in mind that Django and Flask applications need to be started with `pyagent`, so a startup command probably needs to be updated.
+
+### 1) Building an image with AppDynamics package
+
+Install AppDynamics package and configuration during a build phase, by adding commands to your existing Docker files. Build instructions for the underlying application can be found in the `Dockerfile.instr`.
+
+Build an image based on this file by executing `docker-build.sh`, pass the DockerHub handle, image name and tag name, for example:
+
+```
+./docker-build.sh appd my-new-python-agent-image
+```
+
+### 2) Override existing image entrypoint command
+
+This option does not require re-building an image, however, required packages and way of starting an application are overridden in manifest's `command` and `args` section. 
+
+
+
 
 
 
