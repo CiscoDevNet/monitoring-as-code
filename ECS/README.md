@@ -130,8 +130,7 @@ Stack Events can be observed and when status changes to UPDATE_COMPLETED, procee
 
 ![CloudFormation-Created](https://user-images.githubusercontent.com/23483887/101676729-771cba00-3a53-11eb-83e2-4150293adc32.png)
 
-## Observe Created Resources
-
+## Run Task
 
 Navigate to Elastic Container Service (ECS) > Task Definitions in AWS Console, and find a Task named as `ApplicationServiceName` + TaskDefinition of the used Stack. 
 
@@ -139,11 +138,11 @@ Navigate to Elastic Container Service (ECS) > Task Definitions in AWS Console, a
 
 Create an ECS cluster there if there are no suitable ones already, by selecting Clusters from the left-hand side menu > Create Cluster > Networking Only > [provide name].
 
-Now, you can Run a Task:
+Now, you can run a Task:
 
 ![ECS-TaskDefinition-Run](https://user-images.githubusercontent.com/23483887/101673199-c7454d80-3a4e-11eb-8553-931439a2a15e.png)
 
-Out of parameters to configure, when creating a Service, the following are the 
+Configure Service parameters:
 - Launch type - Fargate,
 - Cluster - pick a cluster from a drop-down,
 - Service name - good practice is to be `ApplicationServiceName` + Service,
@@ -151,7 +150,7 @@ Out of parameters to configure, when creating a Service, the following are the
 - Cluster VPC - Virtual Private Cloud where the service is going to run, can be default for testing purposes,
 - Auto-assign public IP - Enabled -in case that your application needs to have an accessible IP address.
 
-Create a Service and take a note of the Security Group in case that ports need to be opened.
+Create a Service and take a note of the Security Group in case that application ports needs to be open and Security Group Inbound rules needs to be added.
 
 
 
