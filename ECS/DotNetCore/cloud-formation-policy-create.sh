@@ -7,5 +7,5 @@ aws iam create-policy --policy-name AppdynamicsStackCloudFormationPolicy \
 
 # attach policy to role
 aws iam attach-role-policy --policy-arn <Created-Policy-ARN> \
---role-name <CLOUD-Formation-Role> \
---profile alex-appd
+--role-name <Cloud-Formation-Role-Name> \
+--profile <my-aws-profile>
