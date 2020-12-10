@@ -1,0 +1,185 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: An CloudFormation template for Fargate. Creates Task Definition running Java application and Appdynamics java agent images.
+Parameters:
+  JavaApplicationImage:
+    Type: String
+    Default: sashaz/java-services:v5
+  AppdAgentImage:
+    Type: String
+    Default: appdynamics/java-agent:20.8.0
+  ApplicationServiceName:
+    Type: String
+    Default: JavaHelloWorldApp
+  AppdAgentServiceName:
+    Type: String
+    Default: AppdJavaAgent
+  ContainerPort:
+    Type: Number
+    Default: 8080
+  # logs
+  LogGroup:
+    Type: String
+    Default: testTask # TODO LogGroup needs to exist in CloudWatch (remove logConfiguration if logs are not to be used)
+  LogRegion:
+    Type: String
+    Default: eu-west-2
+  LogPrefix:
+    Type: String
+    Default: JavaApp
+  # secrets
+  AppDSecretAccessKey:
+    Type: String
+    Default: arn:aws:secretsmanager:eu-west-2:032263611943:secret:APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY-oFRoeE
+  PolicyGetSecrets:
+    Type: String
+    Default: arn:aws:iam::032263611943:policy/AppdynamicsAgentGetSecretsPolicy
+  # AppD properties
+  AppDControllerHost:
+    Type: String
+    Default: nwmaas-2081nosshcontro-dw1rwn6a.appd-cx.com
+  AppDControllerPort:
+    Type: Number
+    Default: 8090
+  AppDControllerSslEnabled:
+    Type: String
+    Default: false
+    AllowedValues: [true, false]
+  AppDAgentAccountName:
+    Type: String
+    Default: customer1
+  AppDAgentApplicationName:
+    Type: String
+    Default: ECS-Fargate-Java
+  AppDAgentTierName:
+    Type: String
+    Default: JavaTier
+  AppDAgentReuseNodeName:
+    Type: String
+    Default: true
+    AllowedValues: [true, false]
+  AppDAgentReuseNodeNamePrefix:
+    Type: String
+    Default: JavaNode
+Resources:
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    DeletionPolicy: Delete
+    Properties:
+      # Name of the task definition. Subsequent versions of the task definition are grouped together under this name.
+      Family: !Join ['', [!Ref ApplicationServiceName, TaskDefinition]]
+      # awsvpc is required for Fargate
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      # 256 (.25 vCPU) - Available memory values: 0.5GB, 1GB, 2GB
+      # 512 (.5 vCPU) - Available memory values: 1GB, 2GB, 3GB, 4GB
+      # 1024 (1 vCPU) - Available memory values: 2GB, 3GB, 4GB, 5GB, 6GB, 7GB, 8GB
+      # 2048 (2 vCPU) - Available memory values: Between 4GB and 16GB in 1GB increments
+      # 4096 (4 vCPU) - Available memory values: Between 8GB and 30GB in 1GB increments
+      Cpu: 256
+      # 0.5GB, 1GB, 2GB - Available cpu values: 256 (.25 vCPU)
+      # 1GB, 2GB, 3GB, 4GB - Available cpu values: 512 (.5 vCPU)
+      # 2GB, 3GB, 4GB, 5GB, 6GB, 7GB, 8GB - Available cpu values: 1024 (1 vCPU)
+      # Between 4GB and 16GB in 1GB increments - Available cpu values: 2048 (2 vCPU)
+      # Between 8GB and 30GB in 1GB increments - Available cpu values: 4096 (4 vCPU)∏
+      Memory: "0.5GB"
+      # A role needed by ECS.
+      # "The ARN of the task execution role that containers in this task can assume. All containers in this task are granted the permissions that are specified in this role."
+      # "There is an optional task execution IAM role that you can specify with Fargate to allow your Fargate tasks to make API calls to Amazon ECR."
+      ExecutionRoleArn: !Ref ExecutionRole
+      # "The Amazon Resource Name (ARN) of an AWS Identity and Access Management (IAM) role that grants containers in the task permission to call AWS APIs on your behalf."
+      TaskRoleArn: !Ref TaskRole
+      Volumes: # A list of volume definitions in JSON format that containers in your task may use.
+      - host: {}
+        name: 'appd-agent-volume'
+      ContainerDefinitions:
+        - Name: !Ref ApplicationServiceName
+          Image: !Ref JavaApplicationImage
+          PortMappings:
+            - containerPort: !Ref ContainerPort 
+              hostPort: !Ref ContainerPort 
+              protocol: tcp 
+          Essential: true
+          DependsOn:
+          - containerName: !Ref AppdAgentServiceName
+            condition: COMPLETE
+          mountPoints: # The mount points for data volumes in your container.
+          - sourceVolume: 'appd-agent-volume'
+            containerPath: '/opt/appdynamics-agent'
+            readOnly: false
+          Command: 
+          - /bin/sh
+          - -c
+          - java $JAVA_OPTS -jar /java-services.jar
+          logConfiguration: # The log configuration specification for the container.
+            logDriver: awslogs  # [REQUIRED] The log driver to use for the container. Valid values are: json-file, syslog, journald, gelf, fluentd, awslogs, splunk, awsfirelens.
+            options: # The configuration options to send to the log driver.
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref LogRegion
+              awslogs-stream-prefix: !Ref LogPrefix
+          secrets: # The secrets to pass to the container.
+          - name: 'APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY'  # [REQUIRED] The name of the secret.
+            valueFrom: !Ref AppDSecretAccessKey
+          environment: # The environment variables to pass to a container.
+          - name: 'APPDYNAMICS_CONTROLLER_HOST_NAME'
+            value: !Ref AppDControllerHost
+          - name: 'APPDYNAMICS_CONTROLLER_PORT'
+            value: !Ref AppDControllerPort
+          - name: 'APPDYNAMICS_CONTROLLER_SSL_ENABLED'
+            value: !Ref AppDControllerSslEnabled
+          - name: 'APPDYNAMICS_AGENT_ACCOUNT_NAME'
+            value: !Ref AppDAgentAccountName
+          - name: 'APPDYNAMICS_AGENT_APPLICATION_NAME'
+            value: !Ref AppDAgentApplicationName
+          - name: 'APPDYNAMICS_AGENT_TIER_NAME'
+            value: !Ref AppDAgentTierName
+          - name: 'APPDYNAMICS_JAVA_AGENT_REUSE_NODE_NAME'
+            value: !Ref AppDAgentReuseNodeName
+          - name: 'APPDYNAMICS_JAVA_AGENT_REUSE_NODE_NAME_PREFIX'
+            value: !Ref AppDAgentReuseNodeNamePrefix
+          - name: 'JAVA_OPTS'
+            value: ' -javaagent:/opt/appdynamics-agent/javaagent.jar '
+        - Name: !Ref AppdAgentServiceName
+          Image: !Ref AppdAgentImage
+          Essential: false 
+          Command: # The command that is passed to the container.
+          - /bin/sh
+          - -c
+          - cp -r /opt/appdynamics/. /opt/temp
+          mountPoints: # The mount points for data volumes in your container.
+          - sourceVolume: 'appd-agent-volume'
+            containerPath: '/opt/temp'
+            readOnly: false
+  # A role needed by ECS
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    DeletionPolicy: Delete
+    Properties:
+      RoleName: !Join ['', [!Ref ApplicationServiceName, ExecutionRole]]
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+        - !Ref PolicyGetSecrets
+  # A role for the containers
+  TaskRole:
+    Type: AWS::IAM::Role
+    DeletionPolicy: Delete
+    Properties:
+      RoleName: !Join ['', [!Ref ApplicationServiceName, TaskRole]]
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      # ManagedPolicyArns:
+      #   -
+      # Policies:
+      #   -
+
+
