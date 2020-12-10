@@ -1,13 +1,14 @@
-# Elastic Container Service (ECS)
+# CloudFormation Templates for Elastic Container Service (ECS)
 
-## What is ECS?
+The following guide provides information and reference to additional documentation about steps to create Task definition and resources needed to define application and AppDynamics agents in Serverless ECS Fargate environment by utilizing AWS CloudFormation templates.
 
 Please note that screenshots are taken for the .NET Core application Stack, however, the same applies to other languages.
 
-https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html
+## What is ECS?
 
+Amazon ECS is a regional service that simplifies running containers in a highly available manner across multiple Availability Zones within a Region. You can create Amazon ECS clusters within a new or existing VPC. After a cluster is up and running, you can create task definitions that define which container images to run across your clusters. Your task definitions are used to run tasks or create services. Container images are stored in and pulled from container registries, for example, Amazon Elastic Container Registry. [learn more](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html)
 
-## ECS terminology
+### ECS Terminology
 
 Task Definition — This a blueprint that describes how a docker container should launch. It contains settings like exposed port, docker image, cpu shares, memory requirement, command to run and environmental variables.
 
@@ -19,11 +20,13 @@ Cluster — A logic group of EC2 instances. When an instance launches the ecs-ag
 
 Container Instance — This is just an EC2 instance that is part of an ECS Cluster and has docker and the ecs-agent running on it.
 
-# EC2 vs. Fargate
+### EC2 vs. Fargate
+
 An Amazon ECS cluster is a logical grouping of tasks or services. You can register one or more Amazon EC2 instances, also referred to as container instances with your cluster to run tasks on, or you can use the serverless infrastructure that Fargate provides. When your tasks are run on Fargate, your cluster resources are managed by Fargate.
+
 For more control, you can host your tasks on a cluster of Amazon EC2 instances that you manage by using the EC2 launch type. 
 
-# Cloud Formation and Task Definition
+### Cloud Formation and Task Definition
 
 AWS CloudFormation is a service that helps you model and set up your Amazon Web Services resources. You create a template that describes all the AWS resources that you want (like Amazon EC2 instances or Amazon RDS DB instances), and AWS CloudFormation takes care of provisioning and configuring those resources for you. You don't need to individually create and configure AWS resources and figure out what's dependent on what; 
 [learn more](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html)
