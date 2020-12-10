@@ -2,7 +2,7 @@
 
 The following guide provides information and reference to additional documentation about steps to create Task definition and resources needed to define application and AppDynamics agents in Serverless ECS Fargate environment by utilizing AWS CloudFormation templates.
 
-Screenshots are taken for the .NET Core application Stack, however, the same applies to other languages.
+Please note that screenshots are taken for the .NET Core application Stack, however, the same applies to other languages.
 
 ## What is ECS?
 
@@ -151,16 +151,3 @@ Configure Service parameters:
 - Auto-assign public IP - Enabled -in case that your application needs to have an accessible IP address.
 
 Create a Service and take note of the Security Group in case that application ports need to be open and Security Group Inbound rules to be added.
-
-
-
-
-
-
-
-
-
-
-
-
-
