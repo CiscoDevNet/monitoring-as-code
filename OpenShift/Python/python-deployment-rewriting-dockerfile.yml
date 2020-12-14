@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-app
+spec:
+  selector:
+    name: flask-app
+  ports:
+  - name: "8080"
+    port: 8080
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appd-python-deployment
+  labels:
+    appName: Python-Deployment-App
+    name: appd-python-deployment
+spec:
+  selector:
+    matchLabels:
+      name: flask-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: flask-app
+    spec:
+      serviceAccountName: appd-account
+      volumes:
+      - name: agent-config
+        configMap:
+          name: agent-config-python # mount configMap containing agent.cfg
+      containers:
+        - name: webapp
+          image: alexappd/python-flask-docker-agent:latest # image built with appdynamics package
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500M
+            requests:
+              cpu: 500m
+              memory: 500M
+          ports:
+          - containerPort: 8080
+          volumeMounts:
+            - name: agent-config
+              mountPath: /opt/appdynamics/agent.cfg
+              subPath: agent.cfg
+          

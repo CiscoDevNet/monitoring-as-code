@@ -1,0 +1,16 @@
+apiVersion: v1
+data:
+  agent.cfg: |-
+    [agent]
+    app = python-demo
+    tier = flask
+    node = flask-node1
+    [controller]
+    host = <controller-dns>
+    port = <controller-port>
+    ssl = off
+    account = <account-name>
+    accesskey = <controller-access-key>
+kind: ConfigMap
+metadata:
+  name: agent-config-python
