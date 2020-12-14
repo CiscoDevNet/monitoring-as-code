@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  CORECLR_PROFILER: "{57e1aa68-2229-41aa-9931-a6e93bbc64d8}"
+  CORECLR_ENABLE_PROFILING: "1"
+  CORECLR_PROFILER_PATH: /opt/appd/dotnet/libappdprofiler.so
+  APPDYNAMICS_AGENT_TIER_NAME: DotNetTier
+  APPDYNAMICS_AGENT_REUSE_NODE_NAME: "true"
+  APPDYNAMICS_AGENT_REUSE_NODE_NAME_PREFIX: DotNetNode
+  APPDYNAMICS_AGENT_ACCOUNT_NAME: customer1
+  APPDYNAMICS_CONTROLLER_HOST_NAME: "nwmaas-2081nosshcontro-dw1rwn6a.appd-cx.com"
+  APPDYNAMICS_CONTROLLER_PORT: "8090"
+  APPDYNAMICS_CONTROLLER_SSL_ENABLED: "false"
+kind: ConfigMap
+metadata:
+  name: appd-dotnet-config
