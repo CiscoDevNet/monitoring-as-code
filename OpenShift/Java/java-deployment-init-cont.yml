@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-app-deployment-init
+spec:
+  selector:
+    matchLabels:
+      app: java-app-deployment-init
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: java-app-deployment-init
+        tier: backend
+        track: stable
+    spec:
+      serviceAccountName: appd-account
+      volumes:
+        - name: appd-agent-volume
+          emptyDir: {}
+      initContainers:
+      - image: appdynamics/java-agent:20.11.0 # agent image
+        name: appd-agent
+        command:
+          - cp
+          - -ra
+          - /opt/appdynamics/.
+          - /opt/appd
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /opt/appd
+          name: appd-agent-volume
+      containers:
+      - image: sashaz/java-services:v6 # application image
+        imagePullPolicy: Always
+        name: java-app-deploy
+        command: ["/bin/sh"]
+        args: ["-c", "UNIQUE_HOST_ID=$(sed -rn '1s#.*/##; 1s/docker-(.{12}).*/\\1/p' /proc/self/cgroup) && java -Dappdynamics.agent.uniqueHostId=$UNIQUE_HOST_ID $JAVA_OPTS -jar /java-services.jar"]
+        ports:
+        - name: http
+          containerPort: 8080
+        resources: 
+          limits:
+            cpu: 500m
+            memory: 500M
+          requests:
+            cpu: 500m
+            memory: 500M     
+        envFrom:
+        - configMapRef:
+            name: appd-java-config
+        env:
+        - name: APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: appd-secrets
+              key: account-access-key
+        - name: APPDYNAMICS_AGENT_APPLICATION_NAME
+          value: Java-Deployment-Init-Cont
+        - name: 'JAVA_OPTS'
+          value: ' -javaagent:/opt/appdynamics-agent/javaagent.jar '
+        - name: APPDYNAMICS_AGENT_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: appd-agent-volume
+          mountPath: /opt/appdynamics-agent
