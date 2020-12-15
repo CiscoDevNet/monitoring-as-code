@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  APPDYNAMICS_AGENT_TIER_NAME: NodeJSTier
+  APPDYNAMICS_AGENT_REUSE_NODE_NAME: "true"
+  APPDYNAMICS_AGENT_REUSE_NODE_NAME_PREFIX: NodeJSNode
+  APPDYNAMICS_AGENT_ACCOUNT_NAME: customer1
+  APPDYNAMICS_CONTROLLER_HOST_NAME: "saas.controller.com"
+  APPDYNAMICS_CONTROLLER_PORT: "8090"
+  APPDYNAMICS_CONTROLLER_SSL_ENABLED: "false"
+  APP_ENTRY_POINT: /usr/src/app #TODO replace with application entry point
+  APPDYNAMICS_AGENT_NODE_NAME: <value> # not used in node name but required by Node.js agent
+  APPDYNAMICS_LOGGER_OUTPUT_TYPE: console
+kind: ConfigMap
+metadata:
+  name: appd-nodejs-config

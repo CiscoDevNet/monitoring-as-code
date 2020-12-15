@@ -1,0 +1,25 @@
+apiVersion: appdynamics.com/v1alpha1
+kind: Clusteragent
+metadata:
+  name: k8s-cluster-agent
+  namespace: appdynamics
+spec:
+  controllerUrl: "https://saas.appdynamics.com"
+  account: "customer1"
+  appName: "OS-Cluster"
+  serviceAccountName: appdynamics-cluster-agent
+  image: "docker.io/appdynamics/cluster-agent:20.11.0"
+  nsToMonitor: [appdynamics,default,dev]
+  instrumentationMethod: Env
+  nsToInstrumentRegex: dev
+  defaultInstrumentMatchString: ^nodejs-app # set this value if using at least one matchString in rules
+  resourcesToInstrument: [Deployment,StatefulSet]
+  instrumentationRules:
+    - namespaceRegex: dev
+      matchString: ^nodejs-app
+      language: nodejs
+      appName: NodeAuto # here, every NodeJS application instrumented is going to report under the single APM app (see naming strategies)
+      imageInfo:
+        image: "docker.io/appdynamics/nodejs-agent:20.7.0-alpinev12"
+        agentMountPath: /opt/appdynamics
+        imagePullPolicy: "IfNotPresent"

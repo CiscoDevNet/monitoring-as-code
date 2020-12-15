@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-app
+  labels:
+    appName: NodeJS-Deployment-App
+    name: appd-nodejs-deployment
+spec:
+  selector:
+    matchLabels:
+      name: nodejs-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: nodejs-app
+        app: appd-nodejs-deployment-auto
+        tier: backend
+    spec:
+      containers:
+        - name: nodejs-app
+          image: alexappd/nodejs-docker-example:latest # application image
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100M
+            requests:
+              cpu: 100m
+              memory: 100M   
+          ports:
+          - containerPort: 3000
+          envFrom:
+          - configMapRef:
+              name: appd-nodejs-config
+          env:
+          - name: APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: appd-secrets
+                key: account-access-key
+      restartPolicy: Always
