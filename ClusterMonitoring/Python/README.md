@@ -45,8 +45,6 @@ https://www.openshift.com/blog/managing-sccs-in-openshift
 
 Update YAML file to enable agent to connect to the controller, and apply to your project.
 
-Compete list of NodeJS agent settings can be found in the documentation [here](https://docs.appdynamics.com/display/PRO45/Node.js+Settings+Reference).
-
 ```
 oc apply -f python-agent-config-map.yml
 ```
