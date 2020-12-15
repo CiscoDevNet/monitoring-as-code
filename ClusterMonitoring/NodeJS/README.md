@@ -83,9 +83,7 @@ kubectl apply -f appd-secrets.yaml --namespace=nodejs-project
 
 A ConfigMap is an API object used to store non-confidential data in key-value pairs. Pods can consume ConfigMaps as environment variables, command-line arguments, or as configuration files in a volume.
 
-A ConfigMap allows you to decouple environment-specific configuration from your container images, so that your applications are easily portable.
-
-https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
+A [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/) allows you to decouple environment-specific configuration from your container images, so that your applications are easily portable.
 
 ## a) Auto-instrumentation (recommended) 
 
@@ -116,14 +114,22 @@ kubectl apply -f nodejs-config-map.yaml
 You should be seeing created ConfigMap in resources.
 
 Besides this, deploy 2 additional ConfigMaps:
+
+### 1) shim.js
+
+Compete list of NodeJS agent settings can be found in the documentation [here](https://docs.appdynamics.com/display/PRO45/Node.js+Settings+Reference).
+
+Environment variables applied are used to copnfigure those necessary settings, mapping is provided in the following ConfigMap file:
 ```
 appd-shim-config-map.yml
 ```
-ConfigAMp resource created from `shim.js` script, in the following way:
+ConfigMap resource created from `shim.js` script, in the following way:
 
 `kubectl create configmap appd-shim --from-file=shim.js -o yaml --dry-run=client`
 
 This JavaScript code is created in order to change a behavior and correct already existing code, it's going to require appdynamics package ans start the application in a way specified in `APP_ENTRY_POINT` environment variable.
+
+### 2) stars.sh
 
 Additionally, the following file needs to be applied in this instrumentation scenario: 
 ```
@@ -131,7 +137,7 @@ appd-start-config-map.yml
 ```
 This ConfigMap is created from a `start.sh` script that installs appdynamics dependencies and starts the previously created `shim.js` script.
 
-## Service account [OpenShift only]
+## Create service account [OpenShift only]
 
 A service account provides an identity for processes that run in a Pod. 
 https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
