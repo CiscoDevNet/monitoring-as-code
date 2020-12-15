@@ -47,12 +47,12 @@ To apply:
 ```
 oc apply -f dotnet-appd-secrets.yaml
 ```
+If created successfully, secret is going to be visible in the OpenShift project resources as well:
+![Secrets](https://user-images.githubusercontent.com/23483887/101013432-2e00cd80-355c-11eb-9cf9-2a87fb884a76.png)
+
 ```
 kubectl apply -f dotnet-appd-secrets.yaml --namespace=appd-dotnet-project
 ```
-
-If created successfully, secret is going to be visible in the OpenShift project resources as well:
-![Secrets](https://user-images.githubusercontent.com/23483887/101013432-2e00cd80-355c-11eb-9cf9-2a87fb884a76.png)
 
 ## Deploy ConfigMap
 
