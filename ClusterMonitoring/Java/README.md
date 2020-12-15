@@ -1,16 +1,24 @@
 
 # 1. Preparation steps for application and APM agent deployment
 
-## Create a project
+## Create a project/namespace
 
+Create a project/namespace that is going to contain application resources.
+
+OpenShift:
 ```
 oc new-project java-project
 ```
 
 ![java-project](https://user-images.githubusercontent.com/23483887/101358199-6a049d00-3892-11eb-92f7-72a019f1bdba.png)
 
+Kubernetes:
+```
+kubectl create namespace java-project
+kubectl config set-context --current --namespace=java-project
+```
 
-### Execute namespace permission fix
+### Execute namespace permission fix [OpenShift only]
 
 You either need to give the service account anyuid SCC or change the uid range for the project (appdynamics) to include 1001
 ``` 
@@ -27,7 +35,7 @@ oc adm policy add-role-to-user admin alice -n java-project
 
 ## Deploy secrets
 
-Provide the value of account-access-key as base64 encoded string, and apply the secrets file.
+Provide the value of `account-access-key` as base64 encoded string, and apply the secrets file.
 
 To encode a secret:
 ```
@@ -45,25 +53,32 @@ oc apply -f dotnet-appd-secrets.yaml
 If created successfully, secret is going to be visible in the OpenShift project resources as well:
 ![java-secret](https://user-images.githubusercontent.com/23483887/101352557-3de51e00-388a-11eb-8701-ac0931379822.png)
 
+```
+kubectl apply -f dotnet-appd-secrets.yaml -n java-project
+```
+
 ## Deploy ConfigMap
 
 A ConfigMap is an API object used to store non-confidential data in key-value pairs. Pods can consume ConfigMaps as environment variables, command-line arguments, or as configuration files in a volume.
 
-A ConfigMap allows you to decouple environment-specific configuration from your container images, so that your applications are easily portable.
+A [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/) allows you to decouple environment-specific configuration from your container images, so that your applications are easily portable.
 
-https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
+Compete list of environment variabels can eb found in the documentation [here](https://docs.appdynamics.com/display/PRO45/Java+Agent+Configuration+Properties).
 
 Provide environment variable values in plaintext format and apply to a cluster.
 
 ```
 oc apply -f dotnet-config-map.yaml
 ```
-
 You should be seeing created ConfigMap in resources:
 
 ![java-config](https://user-images.githubusercontent.com/23483887/101352544-3887d380-388a-11eb-84f2-17c8d48f195d.png)
 
-## Service account
+```
+kubectl apply -f dotnet-config-map.yaml
+```
+
+## Service account [OpenShift only]
 
 A service account provides an identity for processes that run in a Pod. 
 https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
@@ -81,7 +96,6 @@ oc adm policy add-scc-to-user anyuid -z appd-account
 `anyuid` - the equivalent as allowing UID 0, or root user, both inside and outside the container
 https://www.openshift.com/blog/managing-sccs-in-openshift
 
-
 # 2. Deploy application
 Deploy Pods or Deployments, instrument with AppD agents using init containers (init-cont.yml) or auto-instrumentation (auto-instr.yml):
 
@@ -96,10 +110,12 @@ In the repo, examples of how to use init containers with Deployments:
 ```
 oc apply -f java-deployment-init-cont.yml
 ```
+```
+kubectl apply -f java-deployment-init-cont.yml -n java-project
+```
 
 Note that UNIQUE_HOST_ID is used to correlate APM agent and Cluster agent metrics.
 Java Cluster Agent correlation documentation can be found [here](https://docs.appdynamics.com/display/PRO45/Configure+App+Agents+to+Correlate+with+Cluster+Agent).
-
 
 ## b) Use auto-instrumentation (recommended, OpenShift 4.x version)
 
@@ -114,12 +130,6 @@ You can auto-instrument:
 
 [Requirements and Supported environments](https://docs.appdynamics.com/display/PRO45/Cluster+Agent+Requirements+and+Supported+Environments)
 
-In this scenario, you only deploy an application in a usual manner, without the need to change any of the manifests, and the example is provided in the file below:
-
-```
-oc apply -f java-deployment-auto-instr.yml
-```
-
 Auto-instrumentation is then enabled by adding auto-instrumentation config section in `cluster-agent.yaml` file, and Cluster Agent automatically and dynamically applies the configuration changes to all applications in the cluster. An example of cluster agent configuration:
 
 <img width="716" alt="java-auto-instr-config" src="https://user-images.githubusercontent.com/23483887/101358664-147cc000-3893-11eb-9828-a94885403269.png">
@@ -128,9 +138,20 @@ Refer to our documentation for all of the auto-instrumentation parameters explai
 
 Complete documentation about Cluster Agent auto-instrumentation can be found [here](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications).
 
+In this scenario, you only deploy an application in a usual manner, without the need to change any of the manifests, and the example is provided in the file below:
+
+```
+oc apply -f java-deployment-auto-instr.yml
+```
+```
+kubectl apply -f java-deployment-auto-instr.yml
+```
+
 Note: Auto-instrumentation is available for Deployments only, for pods use init-containers.
 
 # 3. Set namespaces/projects to monitor
+
+When it comes to choosing which namespaces to monitor, there are two options below that are available, and usage of ClusterAgent configuration file (`custer-agent.yaml`) recommended to be used whenever possible.
 
 ## Include-exclude namespaces
 
@@ -138,12 +159,11 @@ When it comes to choosing which namespaces to monitor, there are two options ava
 
 ### a) From the Controller UI panel
 
-1) In the upper-right corner, click the Settings icon  > AppDynamics Agents.
+1) In the upper-right corner, click the Settings icon > AppDynamics Agents.
 2) Select the Cluster Agents tab to display a list of clusters. Click Configure.
 3) Add or remove namespaces/projects
 
 ![UI namespaces](https://user-images.githubusercontent.com/23483887/101017420-fb59d380-3561-11eb-94a0-63aaf830151f.png)
-
 
 ### b) Using Cluster Agent configuration (recommended)
 
