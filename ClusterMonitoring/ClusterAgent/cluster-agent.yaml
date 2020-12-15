@@ -4,10 +4,10 @@ metadata:
   name: k8s-cluster-agent
   namespace: appdynamics
 spec:
-  appName: "OpenShift-Operator-20.9.1"
+  appName: "OpenShift-ClusterAgent-20.11.0"
   controllerUrl: "http://nwmaas-20100nosshcontr-r6y4tftd.appd-cx.com:8090"
   account: "customer1"
-  image: "docker.io/appdynamics/cluster-agent:20.9.1"
+  image: "docker.io/appdynamics/cluster-agent:20.11.0"
   serviceAccountName: appdynamics-cluster-agent
   #nsToMonitor:
   #  - appdynamics

@@ -15,9 +15,11 @@ This is an excerpt from our documentation:
 
 Follow [this](https://docs.appdynamics.com/display/PRO45/Deploy+the+AppDynamics+Operator+on+Red+Hat+OpenShift) link to navigate to OpenShift-specific Cluster Agent documentation.
 
+Steps below are going to apply for OpenShift (`oc` commands) and Kubernetes (`kubectl` commands). Please also note that for OpenShift additional permission steps are going to be required, and those chapters are going to be marked with [OpenShift only].
+
 # 2. Preparation steps
 
-## Verify the environment
+## 2.1 Verify the environment
 
 Before starting the installation, verify that you have:
 
@@ -27,7 +29,7 @@ Before starting the installation, verify that you have:
 
 Refer to the [documentation](https://docs.appdynamics.com/display/PRO45/Cluster+Agent+Requirements+and+Supported+Environments) for a full list of supported environments.
 
-## Start OpenShift cluster
+## Start a cluster
 ```
 oc cluster up --public-hostname=<host-name>
 ```
@@ -38,59 +40,90 @@ oc whoami
 ```
 e.g. system:admin
 
-## Create a project
+## Create a project/namespace
 
 Create a project/namespace that is going to contain AppDynamics resources.
 
+OpenShift:
 ```
 oc new-project appdynamics
+```
+
+Kubernetes:
+```
+kubectl create namespace appdynamics
+kubectl config set-context --current --namespace=appdynamics
 ```
 
 ![cluster-agent-project](https://user-images.githubusercontent.com/23483887/101359401-214de380-3894-11eb-82f9-df66e76c1979.png)
 
 ### Verify
 
-Verify that you can see newly created project in projects list.
+Verify that you can see newly created project/namespace
 
 ```
 oc get project
+```
+
+```
+kubectl config view --minify --output 'jsonpath={..namespace}'
 ```
 
 ## Deploy secrets
 
 Secrets needed to be provided to Cluster Agent depend on monitoring strategy that you choose.
 
-### 1) when init containers are used
+Documentation about these secret values can be found in the documentation [here](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications#EnableAuto-InstrumentationofSupportedApplications-enable).
 
-In case of init containers 
+To get controller access key and account, click on a Gear icon at the top right of the controller's screen, choose License from a drop-down menu and Account tab, where Name value is account's name and Access key is a hidden value that can be shown.
 
-```
-./secret-init-containers.sh
-```
+### 1) when auto-instrumentation is used (recommended)
 
-### 2) when auto-instrumentation is used (recommended)
-
-Additional secret is needed in case when auto-instrumentation is used.  The `api-user` with Administrator access added here is required to mark the nodes historical upon pod deletion.
+Additional secret is needed in case when auto-instrumentation is used. The `api-user` with Administrator access added here is required to mark the nodes historical upon pod deletion.
 
 ```
-secret-auto-instrumentation.sh
+Secrets/secret-auto-instrumentation.sh
 ```
 
 ![cluster-agent-secret](https://user-images.githubusercontent.com/23483887/101352766-88ff3100-388a-11eb-8ec3-0cbef4f5299a.png)
 
-Documentation about these secret values can be found in the documentation [here](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications#EnableAuto-InstrumentationofSupportedApplications-enable).
+Update `<access-key>` with a plaintext controller's access key and replace `<username>@<customer>:<password>` with your user's values.
 
-## Execute permission fix
+Apply to cluster:
+```
+oc apply -f Secrets/secret-auto-instrumentation.sh
+```
+```
+kubectl apply -f Secrets/secret-auto-instrumentation.sh
+```
+
+### 2) when init containers are used
+
+In case of init containers, update `<access-key>` with a plaintext controller's access key:
+
+```
+Secrets/secret-init-containers.sh
+```
+
+Apply to cluster:
+```
+oc apply -f Secrets/secret-auto-instrumentation.sh
+```
+```
+kubectl apply -f Secrets/secret-auto-instrumentation.sh
+```
+
+## Execute permission fix [OpenShift only]
 
 In order not to get perission denied when creating a cluster agent resource, as below, permission fix needs to be executed.
 
 ![cluster-agent-permissiion-denied](https://user-images.githubusercontent.com/23483887/101352817-987e7a00-388a-11eb-9b3a-473d9f72c667.png)
 
 ```
-./permission-fix-20.7.sh
+./permission-fix-20.7+.sh
 ```
 
-## User rights
+## User rights [OpenShift only]
 
 Make sure user has rights to perform updates on the cluster:
 
@@ -114,17 +147,23 @@ Operator file can be found in your download bundle (OpenShift example below):
   
 Here, custom resources that are extending mechanisms of Kuberetees are defined, and when applied to a cluster will be running in the cluster pods, interacting with Kubernetes API and sending metrics back to Appdynamics controller.
 
-After deploying an operator (kubectl apply), in order to configure a Cluster agent, cluster-agent.yaml is used, that when deployed to a cluster is configuring a Clusteragent custom resource defined in the operator.
+After deploying an operator (`kubectl apply` or `oc apply`), in order to configure a Cluster agent, `cluster-agent.yaml` is used, that when deployed to a cluster is configuring a Clusteragent custom resource defined in the operator.
 
 ```
-oc apply -f cluster-agent-operator-openshift.yaml
+kubectl apply -f Kubernetes/cluster-agent-operator.yaml -n appdynamics
+```
+
+```
+oc apply -f OpenShift/cluster-agent-operator-openshift.yaml
 ```
 
 Documentation about how to deploy an Operator can be found [here](https://docs.appdynamics.com/display/PRO45/Deploy+the+AppDynamics+Operator+on+Kubernetes).
 
+Also, you can find a ClusterAgent Operator GitHub project [here](https://github.com/Appdynamics/appdynamics-operator) where issues can be raised and latest examples accessed from.
+
 ## Configure and deploy cluster agent
 
-Configure Cluster Agent to connect to controller
+Configure Cluster Agent to connect to controller, filter namespaces to monitor, instrument applications, set logging level and similar.
 
 <img width="615" alt="cluster-agent-config" src="https://user-images.githubusercontent.com/23483887/101360739-fc5a7000-3895-11eb-9747-2de9070ec31c.png">
 
@@ -133,8 +172,16 @@ On how to configure any of the available YAML config parameters, refer to the [d
 Apply Cluster Agent to the cluster:
 
 ```
+kubectl apply -f cluster-agent.yaml -n appdynamics
+```
+
+```
 oc apply -f cluster-agent.yaml
 ```
+
+Minimal configuration for a ClusterAgent can be found in `cluster-agent-minimal.yaml`, and full configuration in a file `cluster-agent-full.yaml`.
+
+For a detailed documentation about ClusterAgent configuration, refer to the official [documentation](https://docs.appdynamics.com/display/PRO45/Configure+the+Cluster+Agent).
 
 ### Validate
 
@@ -142,7 +189,7 @@ If everything run as expected, you should be seeing Cluster Agent under the Serv
 
 ![cluster-agent-servers](https://user-images.githubusercontent.com/23483887/101352639-60773700-388a-11eb-86bb-3f10a16300b7.png)
 
-Here, you can access the dahboard for each monitored cluster:
+Here, you can access the dashboard for each monitored cluster:
 
 ![cluster-agent-dash](https://user-images.githubusercontent.com/23483887/101352708-771d8e00-388a-11eb-8f99-586ccf0cb939.png)
 
@@ -201,6 +248,10 @@ GitHub repo with additional resources ia also available, and can be found [here]
 
 I order to monitor nodes, infrastructure visibility can be deployed to instrument each machine. 
 This is not an recommended approach as it can consume additional resources and monitoring should be based on cluster events and pod monitoring, however, if needed, deploy infrastructure visibility agent:
+
+```
+kubectl apply -f infraviz-agent.yaml
+```
 
 ```
 oc apply -f infraviz-agent.yaml
