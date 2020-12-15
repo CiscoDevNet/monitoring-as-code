@@ -1,16 +1,22 @@
 
 # 1. Preparation steps for application and APM agent deployment
 
-## Create a project
+## Create a project/namespace [Optional]
 
+Create a project/namespace that is going to contain application resources.
+
+OpenShift:
 ```
 oc new-project appd-dotnet-project
 ```
-
 ![Projects](https://user-images.githubusercontent.com/23483887/101011897-a23a7180-355a-11eb-923c-764cf2a5792a.png)
 
-
-### Execute namespace permission fix
+Kubernetes:
+```
+kubectl create namespace appd-dotnet-project
+kubectl config set-context --current --namespace=appd-dotnet-project
+```
+### Execute namespace permission fix [OpenShift only]
 
 You either need to give the service account anyuid SCC or change the uid range for the project (appdynamics) to include 1001
 ``` 
@@ -41,6 +47,9 @@ To apply:
 ```
 oc apply -f dotnet-appd-secrets.yaml
 ```
+```
+kubectl apply -f dotnet-appd-secrets.yaml --namespace=appd-dotnet-project
+```
 
 If created successfully, secret is going to be visible in the OpenShift project resources as well:
 ![Secrets](https://user-images.githubusercontent.com/23483887/101013432-2e00cd80-355c-11eb-9cf9-2a87fb884a76.png)
@@ -58,12 +67,15 @@ Provide environment variable values in plaintext format and apply to a cluster.
 ```
 oc apply -f dotnet-config-map.yaml
 ```
-
 You should be seeing created ConfigMap in resources:
 
 ![ConfigMap](https://user-images.githubusercontent.com/23483887/101013219-da8e7f80-355b-11eb-923d-93d87c5f9f8b.png)
 
-## Service account
+```
+kubectl apply -f dotnet-config-map.yaml
+```
+
+## Service account [OpenShift only]
 
 A service account provides an identity for processes that run in a Pod. 
 https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
@@ -81,11 +93,10 @@ oc adm policy add-scc-to-user anyuid -z appd-account
 `anyuid` - the equivalent as allowing UID 0, or root user, both inside and outside the container
 https://www.openshift.com/blog/managing-sccs-in-openshift
 
-
 # 2. Deploy application
-Deploy Pods or Deployments, instrument with AppD agents using init containers (init-cont.yml) or auto-instrumentation (auto-instr.yml):
+Deploy Pods or Deployments, instrument with AppD agents using init containers (init-cont.yml) or auto-instrumentation (auto-instr.yml) that is a recommended approach to be used whenever possible. For latest list of auto-intrumentation supported environments refer to the official [documentation](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications).
 
-## a) Use init containers
+## a) Init containers
 
 Init containers are an option available in Kubernetes environments to run additional containers at startup time that help initialize an application.
 
@@ -96,13 +107,15 @@ In the repo, examples of how to use init containers with Deployments:
 ```
 oc apply -f dotnet-deployment-init-cont.yml
 ```
+```
+kubectl apply -f dotnet-deployment-init-cont.yml
+```
 sa well as Pods:
-
 ```
 oc apply -f dotnet-pod-init-cont.yml
 ```
 
-## b) Use auto-instrumentation (recommended)
+## b) Auto-instrumentation (recommended)
 
 With the Cluster Agent, you can auto-instrument containerized apps. Auto-instrumentation leverages Kubernetes init containers to instrument Kubernetes applications.
 
@@ -120,6 +133,9 @@ In this scenario, you only deploy an application in a usual manner, without the 
 ```
 oc apply -f dotnet-deployment-auto-instr.yml
 ```
+```
+kubectl apply -f dotnet-deployment-auto-instr.yml
+```
 
 Auto-instrumentation is then enabled by adding auto-instrumentation config section in `cluster-agent.yaml` file, and Cluster Agent automatically and dynamically applies the configuration changes to all applications in the cluster. An example of cluster agent configuration:
 
@@ -135,16 +151,15 @@ Note: Auto-instrumentation is available for Deployments only, for pods use init-
 
 ## Include-exclude namespaces
 
-When it comes to choosing which namespaces to monitor, there are two options available:
+When it comes to choosing which namespaces to monitor, there are two options below that are available, and usage of ClusterAgent configuration file (`custer-agent.yaml`) recommended to be used whenever possible.
 
 ### a) From the Controller UI panel
 
-1) In the upper-right corner, click the Settings icon  > AppDynamics Agents.
+1) In the upper-right corner, click the Settings icon > AppDynamics Agents.
 2) Select the Cluster Agents tab to display a list of clusters. Click Configure.
 3) Add or remove namespaces/projects
 
 ![UI namespaces](https://user-images.githubusercontent.com/23483887/101017420-fb59d380-3561-11eb-94a0-63aaf830151f.png)
-
 
 ### b) Using Cluster Agent configuration (recommended)
 
@@ -200,7 +215,3 @@ Failed Pods are deleted when:
 2) namespace/project is set to un-monitor
 
 Refer to [this](https://appdynamics.zendesk.com/agent/tickets/243414) support ticket for more details.
-
-
-
-
