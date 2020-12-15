@@ -29,12 +29,12 @@ Before starting the installation, verify that you have:
 
 Refer to the [documentation](https://docs.appdynamics.com/display/PRO45/Cluster+Agent+Requirements+and+Supported+Environments) for a full list of supported environments.
 
-## Start a cluster
+## Prepare CLuster [OpenShift only]
+Start a cluster:
 ```
 oc cluster up --public-hostname=<host-name>
 ```
-
-## Login to console
+Login to console:
 ```
 oc whoami
 ```
@@ -48,23 +48,24 @@ OpenShift:
 ```
 oc new-project appdynamics
 ```
+![openshift-cluster-agent-project](https://user-images.githubusercontent.com/23483887/101359401-214de380-3894-11eb-82f9-df66e76c1979.png)
 
 Kubernetes:
 ```
 kubectl create namespace appdynamics
 kubectl config set-context --current --namespace=appdynamics
 ```
-
-![cluster-agent-project](https://user-images.githubusercontent.com/23483887/101359401-214de380-3894-11eb-82f9-df66e76c1979.png)
+<img width="597" alt="kubernetes-cluster-agent-project" src="https://user-images.githubusercontent.com/23483887/102226371-35bb5d00-3ee0-11eb-9869-e702dc7317d6.png">
 
 ### Verify
 
 Verify that you can see newly created project/namespace
 
+OpenShift:
 ```
 oc get project
 ```
-
+Kubernetes:
 ```
 kubectl config view --minify --output 'jsonpath={..namespace}'
 ```
@@ -77,7 +78,7 @@ Documentation about these secret values can be found in the documentation [here]
 
 To get controller access key and account, click on a Gear icon at the top right of the controller's screen, choose License from a drop-down menu and Account tab, where Name value is account's name and Access key is a hidden value that can be shown.
 
-### 1) when auto-instrumentation is used (recommended)
+### 1) Auto-instrumentation (recommended)
 
 Additional secret is needed in case when auto-instrumentation is used. The `api-user` with Administrator access added here is required to mark the nodes historical upon pod deletion.
 
@@ -97,9 +98,9 @@ oc apply -f Secrets/secret-auto-instrumentation.sh
 kubectl apply -f Secrets/secret-auto-instrumentation.sh
 ```
 
-### 2) when init containers are used
+### 2) Init containers
 
-In case of init containers, update `<access-key>` with a plaintext controller's access key:
+In case of this instrumentation strategy, update `<access-key>` with a plaintext controller's access key:
 
 ```
 Secrets/secret-init-containers.sh
