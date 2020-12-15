@@ -1,6 +1,9 @@
-# OpenShift
+# Cluster Monitoring - OpenShift and Kubernetes
 
-# Cluster Agent
+In order to monitor Kubernetees and OpenShift clusters, AppDynamics introduced Cluster Agent to collect events and metrics about health and availability of the whole cluster alongside with individual pods and namespaces or projects. With a granular approach to monitoring, you can fine-tune the level to which you would like to introduce monitoring. 
+On the other hand, APM agents provide in-depth information about each application deployed and can be added to your containerized applications in multiple ways. Additionally, correlation between cluster and application metrics provides the full coverage and visibility of your environments.
+
+# 1. Cluster Agent
 
 ## Overview
 
@@ -16,7 +19,7 @@ Complete documentation about Cluster Agent can be found [here](https://docs.appd
 
 References to relevant documentation sections, working examples and implementation steps you can find in `ClusterAgent` section of this repo.
 
-#  Application agents
+# 2. Application agents
 
 ## Overview
 
