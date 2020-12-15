@@ -1,14 +1,36 @@
-
 # 1. Preparation steps for application and APM agent deployment
+
+Instrumenting NodeJS applications with AppDynamics agent can be done in multiple ways:
+- Use Auto-Instrumentation (recommended)
+- Use Init Containers
+- Use a Dockerfile
+
+## a) Auto-instrumentation (recommended) 
+
+We are recommending auto-instrumentation whenever possible. 
+
+You can auto-instrument:
+- Node.js applications with the Node.js Agent
+- .NET Core on Linux application with the .NET Agent for Linux
+- Java applications with the Java Agent
+
+[Requirements and Supported environments](https://docs.appdynamics.com/display/PRO45/Cluster+Agent+Requirements+and+Supported+Environments)
+
+## b) Init containers
+
+We will cover the option of using init containers in the following documentation, as it does not require re-building images but does require updating application manifests to mount volume and override startup command.
+
+All necessary resources for this instrumentation approach can be found in `init-container-resources` sub-folder.
+
+## c) Dockerfile
+
+For the last option that involves building images from scratch, please refer to the [documentation](https://docs.appdynamics.com/display/PRO45/Install+the+Node.js+Agent+in+Containers#InstalltheNode.jsAgentinContainers-dockerfile).
 
 ## Create a project
 
 ```
-oc new-project java-project
+oc new-project nodejs-project
 ```
-
-![java-project](https://user-images.githubusercontent.com/23483887/101358199-6a049d00-3892-11eb-92f7-72a019f1bdba.png)
-
 
 ### Execute namespace permission fix
 
@@ -22,7 +44,7 @@ https://www.openshift.com/blog/managing-sccs-in-openshift
 In case that project is still not visible from the OpenShift console,  add your currrent user (alice below) to project admins, for example:
 
 ```
-oc adm policy add-role-to-user admin alice -n java-project
+oc adm policy add-role-to-user admin alice -n nodejs-project
 ```
 
 ## Deploy secrets
@@ -43,7 +65,7 @@ oc apply -f dotnet-appd-secrets.yaml
 ```
 
 If created successfully, secret is going to be visible in the OpenShift project resources as well:
-![java-secret](https://user-images.githubusercontent.com/23483887/101352557-3de51e00-388a-11eb-8701-ac0931379822.png)
+![Secrets](https://user-images.githubusercontent.com/23483887/101013432-2e00cd80-355c-11eb-9cf9-2a87fb884a76.png)
 
 ## Deploy ConfigMap
 
@@ -53,15 +75,43 @@ A ConfigMap allows you to decouple environment-specific configuration from your 
 
 https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
 
+## a) Auto-instrumentation (recommended) 
+
 Provide environment variable values in plaintext format and apply to a cluster.
 
 ```
-oc apply -f dotnet-config-map.yaml
+oc apply -f nodejs-config-map.yaml
 ```
 
-You should be seeing created ConfigMap in resources:
+You should be seeing created ConfigMap in resources.
 
-![java-config](https://user-images.githubusercontent.com/23483887/101352544-3887d380-388a-11eb-84f2-17c8d48f195d.png)
+## b) Init containers
+
+Provide environment variable values in plaintext format, and update value of `APP_ENTRY_POINT` to match your app's entry point.
+
+Apply changes to the cluster. 
+
+```
+oc apply -f nodejs-config-map.yaml
+```
+
+You should be seeing created ConfigMap in resources.
+
+Besides this, deploy 2 additional ConfigMaps:
+```
+appd-shim-config-map.yml
+```
+ConfigAMp resource created from `shim.js` script, in the following way:
+
+`oc create configmap appd-shim --from-file=shim.js -o yaml --dry-run=client`
+
+This JavaScript code is created in order to change a behavior and correct already existing code, it's going to require appdynamics package ans start the application in a way specified in `APP_ENTRY_POINT` environment variable.
+
+Additionally, the following file needs to be applied in this instrumentation scenario: 
+```
+appd-start-config-map.yml
+```
+This ConfigMap is created from a `start.sh` script that installs appdynamics dependencies and starts the previously created `shim.js` script.
 
 ## Service account
 
@@ -83,52 +133,49 @@ https://www.openshift.com/blog/managing-sccs-in-openshift
 
 
 # 2. Deploy application
+
 Deploy Pods or Deployments, instrument with AppD agents using init containers (init-cont.yml) or auto-instrumentation (auto-instr.yml):
 
-## a) Use init containers (OpenShift 3.x version)
+AppDynamics documentation about how to deploy NodeJS agent can be found [here](https://docs.appdynamics.com/display/PRO45/Install+the+Node.js+Agent+in+Containers).
 
-Init containers are an option available in Kubernetes environments to run additional containers at startup time that help initialize an application.
+## a) Use auto-instrumentation (recommended)
 
-Appdynamics provides APM agent images in the [Docker Hub](https://hub.docker.com/u/appdynamics), and when used as init containers, can act as a delivery mechanism to copy the APM agent files into the application container at deploy time and then terminate.
-
-In the repo, examples of how to use init containers with Deployments:
+Make sure to deploy Cluster Agent before proceeding with this approach, an example can be found in the following file:
 
 ```
-oc apply -f java-deployment-init-cont.yml
+cluster-agent-nodejs.yml
 ```
-
-Note that UNIQUE_HOST_ID is used to correlate APM agent and Cluster agent metrics.
-Java Cluster Agent correlation documentation can be found [here](https://docs.appdynamics.com/display/PRO45/Configure+App+Agents+to+Correlate+with+Cluster+Agent).
-
-
-## b) Use auto-instrumentation (recommended, OpenShift 4.x version)
-
-With the Cluster Agent, you can auto-instrument containerized apps. Auto-instrumentation leverages Kubernetes init containers to instrument Kubernetes applications.
-
-Make sure to deploy Cluster Agent before proceeding with this approach.
-
-You can auto-instrument:
-- Node.js applications with the Node.js Agent
-- .NET Core on Linux application with the .NET Agent for Linux
-- Java applications with the Java Agent
-
-[Requirements and Supported environments](https://docs.appdynamics.com/display/PRO45/Cluster+Agent+Requirements+and+Supported+Environments)
 
 In this scenario, you only deploy an application in a usual manner, without the need to change any of the manifests, and the example is provided in the file below:
 
 ```
-oc apply -f java-deployment-auto-instr.yml
+oc apply -f nodejs-deployment-auto-instr.yml
 ```
 
 Auto-instrumentation is then enabled by adding auto-instrumentation config section in `cluster-agent.yaml` file, and Cluster Agent automatically and dynamically applies the configuration changes to all applications in the cluster. An example of cluster agent configuration:
 
-<img width="716" alt="java-auto-instr-config" src="https://user-images.githubusercontent.com/23483887/101358664-147cc000-3893-11eb-9828-a94885403269.png">
+<img width="598" alt="Auto-Instrumentation Config Example" src="https://user-images.githubusercontent.com/23483887/101016659-02ccad00-3561-11eb-8217-f8cd217b6c88.png">
 
 Refer to our documentation for all of the auto-instrumentation parameters explained in detail [Auto-Instrumentation Parameters](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications).
 
 Complete documentation about Cluster Agent auto-instrumentation can be found [here](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications).
 
 Note: Auto-instrumentation is available for Deployments only, for pods use init-containers.
+
+## b) Use init containers
+
+Cluster Agent is not necessary with this approach, however, an example can be found in `cluster-agent-node-init-cont.yml` file.
+
+Init containers are an option available in Kubernetes environments to run additional containers at startup time that help initialize an application.
+
+Appdynamics provides APM agent images in the [Docker Hub](https://hub.docker.com/u/appdynamics), and when used as init containers, can act as a delivery mechanism to copy the APM agent files into the application container at deploy time and then terminate.
+
+
+In the repo, examples of how to use init containers with Deployments:
+
+```
+oc apply -f nodejs-deployment-init-cont.yml
+```
 
 # 3. Set namespaces/projects to monitor
 
@@ -177,20 +224,29 @@ Correlation of APM agents and Cluster Agent depends on deployment techniquie pre
 
 It enables a direct link between Cluster agent monitored Pod and APM application in AppDynamics Applications. When successful, a link similar to this appears in Cluster Agent view:
 
-![java-pod](https://user-images.githubusercontent.com/23483887/101352608-548b7500-388a-11eb-8d05-6f21e31ff18b.png)
+![APM Correlation](https://user-images.githubusercontent.com/23483887/101019373-c8fda580-3564-11eb-8add-de67358eae6e.png)
 
-## a) When you are using init containers
 
-Note: This correlation technique can be used with Java applications only.
-
-When init container is used, UNIQUE_HOST_ID can be set in order to correlate APM agent and cluster agent metrics.
-Depending on your version, the command that needs to be executed varies, and for the latest infoamtion on this refer to the documentation [here](https://docs.appdynamics.com/display/PRO45/Configure+App+Agents+to+Correlate+with+Cluster+Agent).
-
-## b) When you are using auto-instrumentation (recommended)
+## a) When you are using auto-instrumentation (recommended)
 
 Without the need to use init containers, auto-instrumentation can be used to inject agent and correlate APM with cluster agent.
 
 No additional actions are required in order to enable correlation.
+
+## b) When you are using init containers
+
+Set the UNIQUE_HOST_ID environment variable to enable APM correlation with the Cluster Agent. 
+
+Documentation can be found [here](https://docs.appdynamics.com/display/PRO45/.Install+the+Node.js+Agent+in+Containers+v20.6#id-.InstalltheNode.jsAgentinContainersv20.6-SettheUNIQUE_HOST_IDEnvironmentVariable).
+
+```
+spec:
+  containers:
+    command: ["/bin/sh"]
+    args: ["-c", "export UNIQUE_HOST_ID=$(sed -rn '1s#.*/##; 1s/(.{12}).*/\\1/p' /proc/self/cgroup) && node /nodejsapp/myapp.js"]
+```
+
+Refer to node application manifest `nodejs-deployment-init-cont.yml`.
 
 # 5. Failed pods - when pods are getting deleted?
 

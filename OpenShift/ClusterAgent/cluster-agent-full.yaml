@@ -1,0 +1,79 @@
+apiVersion: appdynamics.com/v1alpha1
+kind: Clusteragent
+metadata:
+  name: k8s-cluster-agent
+  namespace: appdynamics
+spec:
+  appName: "Kubernetes-Operator-20.11.0" #"<app-name>"
+  controllerUrl: "http://nwmaas-20100nosshcontr-r6y4tftd.appd-cx.com:8090" # "<protocol>://<appdynamics-controller-host>:<port>"
+  account: "customer1" # "<account-name>"
+  # docker image info
+  image: "docker.io/appdynamics/cluster-agent:20.11.0"
+  #imagePullSecrets:
+  #  name: "<your-docker-pull-secret-name>"
+  serviceAccountName: appdynamics-cluster-agent
+  ### all of the following parameters are optional
+  eventUploadInterval: 10
+  containerRegistrationInterval: 120
+  httpClientTimeout: 30
+  customSSLSecret: "<secret-name>"
+  proxyUrl: "<protocol>://<domain>:<port>"
+  proxyUser: "<proxy-user>"
+  metricsSyncInterval: 30
+  clusterMetricsSyncInterval: 60
+  metadataSyncInterval: 60
+  containerBatchSize: 25
+  podBatchSize: 30
+  metricUploadRetryCount: 3
+  metricUploadRetryIntervalMilliSeconds: 5
+  nodeSelector:
+    kubernetes.io/os: linux
+  podFilter:
+    # blocklistedLabels:
+    #   - label1: value1
+    # allowlistedLabels:
+    #   - label1: value1
+    #   - label2: value2
+    # allowlistedNames:
+    #   - name1
+    # blocklistedNames:
+    #   - name1
+    #   - name2
+  logLevel: "INFO"
+  logFileSizeMb: 5
+  logFileBackups: 3
+  stdoutLogging: "true"
+  resources:
+    limits:
+        cpu: 300m
+        memory: "200Mi"
+    requests:
+        cpu: 200m
+        memory: "100Mi"
+  # auto-instrumentation config
+  instrumentationMethod: Env
+  nsToInstrumentRegex: ecom|books|groceries
+  defaultAppName: Ecommerce
+  appNameStrategy: namespace
+  imageInfo:
+    java:
+      image: "docker.io/appdynamics/java-agent:latest"
+      agentMountPath: /opt/appdynamics
+      imagePullPolicy: Always
+  instrumentationRules:
+    - namespaceRegex: groceries
+      language: dotnetcore
+      imageInfo:
+        image: "docker.io/appdynamics/dotnet-core-agent:latest"
+        agentMountPath: /opt/appdynamics
+        imagePullPolicy: Always
+    - namespaceRegex: books
+      matchString: openmct
+      language: nodejs
+      imageInfo:
+        image: "docker.io/appdynamics/nodejs:20.6.0"
+        agentMountPath: /opt/appdynamics
+        imagePullPolicy: Always
+      analyticsHost: <hostname of the Analytics Agent>
+      analyticsPort: 443
+      analyticsSslEnabled: true
