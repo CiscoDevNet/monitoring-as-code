@@ -85,17 +85,15 @@ Additional secret is needed in case when auto-instrumentation is used. The `api-
 ```
 Secrets/secret-auto-instrumentation.sh
 ```
+Update `<access-key>` with a plaintext controller's access key and replace `<username>@<customer>:<password>` with your user's values before applying to a cluster:
 
-![cluster-agent-secret](https://user-images.githubusercontent.com/23483887/101352766-88ff3100-388a-11eb-8ec3-0cbef4f5299a.png)
-
-Update `<access-key>` with a plaintext controller's access key and replace `<username>@<customer>:<password>` with your user's values.
-
-Apply to cluster:
 ```
 oc apply -f Secrets/secret-auto-instrumentation.sh
 ```
+![cluster-agent-secret](https://user-images.githubusercontent.com/23483887/101352766-88ff3100-388a-11eb-8ec3-0cbef4f5299a.png)
+
 ```
-kubectl apply -f Secrets/secret-auto-instrumentation.sh
+kubectl apply -f Secrets/secret-auto-instrumentation.sh -n appdynamics
 ```
 
 ### 2) Init containers
@@ -106,12 +104,12 @@ In case of this instrumentation strategy, update `<access-key>` with a plaintext
 Secrets/secret-init-containers.sh
 ```
 
-Apply to cluster:
+Apply to a cluster:
 ```
 oc apply -f Secrets/secret-auto-instrumentation.sh
 ```
 ```
-kubectl apply -f Secrets/secret-auto-instrumentation.sh
+kubectl apply -f Secrets/secret-auto-instrumentation.sh -n appdynamics
 ```
 
 ## Execute permission fix [OpenShift only]
@@ -144,18 +142,17 @@ Download Cluster agent files from our AppDynamics [download centre](https://down
 
 Operator file can be found in your download bundle (OpenShift example below):
 
-`./appdynamics-cluster-agent-<version>/cluster-agent-operator-openshift.yaml`
+`/appdynamics-cluster-agent-<version>/cluster-agent-operator-openshift.yaml`
   
 Here, custom resources that are extending mechanisms of Kuberetees are defined, and when applied to a cluster will be running in the cluster pods, interacting with Kubernetes API and sending metrics back to Appdynamics controller.
 
 After deploying an operator (`kubectl apply` or `oc apply`), in order to configure a Cluster agent, `cluster-agent.yaml` is used, that when deployed to a cluster is configuring a Clusteragent custom resource defined in the operator.
 
 ```
-kubectl apply -f Kubernetes/cluster-agent-operator.yaml -n appdynamics
-```
-
-```
 oc apply -f OpenShift/cluster-agent-operator-openshift.yaml
+```
+```
+kubectl apply -f Kubernetes/cluster-agent-operator.yaml -n appdynamics
 ```
 
 Documentation about how to deploy an Operator can be found [here](https://docs.appdynamics.com/display/PRO45/Deploy+the+AppDynamics+Operator+on+Kubernetes).
@@ -173,11 +170,10 @@ On how to configure any of the available YAML config parameters, refer to the [d
 Apply Cluster Agent to the cluster:
 
 ```
-kubectl apply -f cluster-agent.yaml -n appdynamics
-```
-
-```
 oc apply -f cluster-agent.yaml
+```
+```
+kubectl apply -f cluster-agent.yaml -n appdynamics
 ```
 
 Minimal configuration for a ClusterAgent can be found in `cluster-agent-minimal.yaml`, and full configuration in a file `cluster-agent-full.yaml`.
@@ -212,7 +208,6 @@ When it comes to choosing which namespaces to monitor, there are two options ava
 
 ![UI namespaces](https://user-images.githubusercontent.com/23483887/101017420-fb59d380-3561-11eb-94a0-63aaf830151f.png)
 
-
 ### b) Using Cluster Agent configuration (recommended)
 
 This is achieved by modifying the __nsToMonitor__ and/or __nsToMonitorRegex__ field in the `cluster-agent.yaml` file before deploying the Cluster Agent. 
@@ -239,25 +234,20 @@ The following are common namespace behavior scenarios with the __nsToMonitor__ f
 
 These scenarios are also covered in the documentation [here](https://docs.appdynamics.com/display/PRO45/Use+the+Cluster+Agent).
 
-
 # 5. Additional resources
 
 GitHub repo with additional resources ia also available, and can be found [here](https://github.com/Appdynamics/appdynamics-operator#clusteragent-deployment).
-
 
 # 6. Infrastructure visibility
 
 I order to monitor nodes, infrastructure visibility can be deployed to instrument each machine. 
 This is not an recommended approach as it can consume additional resources and monitoring should be based on cluster events and pod monitoring, however, if needed, deploy infrastructure visibility agent:
-
-```
-kubectl apply -f infraviz-agent.yaml
-```
-
 ```
 oc apply -f infraviz-agent.yaml
 ```
-
+```
+kubectl apply -f infraviz-agent.yaml
+```
 You can access a GitHub with examples [here](https://github.com/Appdynamics/appdynamics-operator#the-machine-agent-deployment).
 
 
