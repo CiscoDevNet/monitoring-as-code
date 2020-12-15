@@ -26,13 +26,21 @@ All necessary resources for this instrumentation approach can be found in `init-
 
 For the last option that involves building images from scratch, please refer to the [documentation](https://docs.appdynamics.com/display/PRO45/Install+the+Node.js+Agent+in+Containers#InstalltheNode.jsAgentinContainers-dockerfile).
 
-## Create a project
+## Create a project/namespace  [Optional]
 
+Create a project/namespace that is going to contain application resources.
+
+OpenShift:
 ```
 oc new-project nodejs-project
 ```
+Kubernetes:
+```
+kubectl create namespace nodejs-project
+kubectl config set-context --current --namespace=nodejs-project
+```
 
-### Execute namespace permission fix
+### Execute namespace permission fix [OpenShift only]
 
 You either need to give the service account anyuid SCC or change the uid range for the project (appdynamics) to include 1001
 ``` 
@@ -49,7 +57,7 @@ oc adm policy add-role-to-user admin alice -n nodejs-project
 
 ## Deploy secrets
 
-Provide the value of account-access-key as base64 encoded string, and apply the secrets file.
+Provide the value of `account-access-key` as base64 encoded string, and apply the secrets file.
 
 To encode a secret:
 ```
@@ -61,11 +69,15 @@ echo "base64-encoded-secret-here" | base64 -d
 ```
 To apply:
 ```
-oc apply -f dotnet-appd-secrets.yaml
+oc apply -f appd-secrets.yaml
 ```
 
 If created successfully, secret is going to be visible in the OpenShift project resources as well:
 ![Secrets](https://user-images.githubusercontent.com/23483887/101013432-2e00cd80-355c-11eb-9cf9-2a87fb884a76.png)
+
+```
+kubectl apply -f appd-secrets.yaml --namespace=nodejs-project
+```
 
 ## Deploy ConfigMap
 
@@ -82,6 +94,9 @@ Provide environment variable values in plaintext format and apply to a cluster.
 ```
 oc apply -f nodejs-config-map.yaml
 ```
+```
+kubectl apply -f nodejs-config-map.yaml -n nodejs-project
+```
 
 You should be seeing created ConfigMap in resources.
 
@@ -94,6 +109,9 @@ Apply changes to the cluster.
 ```
 oc apply -f nodejs-config-map.yaml
 ```
+```
+kubectl apply -f nodejs-config-map.yaml
+```
 
 You should be seeing created ConfigMap in resources.
 
@@ -103,7 +121,7 @@ appd-shim-config-map.yml
 ```
 ConfigAMp resource created from `shim.js` script, in the following way:
 
-`oc create configmap appd-shim --from-file=shim.js -o yaml --dry-run=client`
+`kubectl create configmap appd-shim --from-file=shim.js -o yaml --dry-run=client`
 
 This JavaScript code is created in order to change a behavior and correct already existing code, it's going to require appdynamics package ans start the application in a way specified in `APP_ENTRY_POINT` environment variable.
 
@@ -113,7 +131,7 @@ appd-start-config-map.yml
 ```
 This ConfigMap is created from a `start.sh` script that installs appdynamics dependencies and starts the previously created `shim.js` script.
 
-## Service account
+## Service account [OpenShift only]
 
 A service account provides an identity for processes that run in a Pod. 
 https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
@@ -130,7 +148,6 @@ oc adm policy add-scc-to-user anyuid -z appd-account
 
 `anyuid` - the equivalent as allowing UID 0, or root user, both inside and outside the container
 https://www.openshift.com/blog/managing-sccs-in-openshift
-
 
 # 2. Deploy application
 
@@ -151,6 +168,9 @@ In this scenario, you only deploy an application in a usual manner, without the 
 ```
 oc apply -f nodejs-deployment-auto-instr.yml
 ```
+```
+kubectl apply -f nodejs-deployment-auto-instr.yml
+```
 
 Auto-instrumentation is then enabled by adding auto-instrumentation config section in `cluster-agent.yaml` file, and Cluster Agent automatically and dynamically applies the configuration changes to all applications in the cluster. An example of cluster agent configuration:
 
@@ -170,7 +190,6 @@ Init containers are an option available in Kubernetes environments to run additi
 
 Appdynamics provides APM agent images in the [Docker Hub](https://hub.docker.com/u/appdynamics), and when used as init containers, can act as a delivery mechanism to copy the APM agent files into the application container at deploy time and then terminate.
 
-
 In the repo, examples of how to use init containers with Deployments:
 
 ```
@@ -181,7 +200,7 @@ oc apply -f nodejs-deployment-init-cont.yml
 
 ## Include-exclude namespaces
 
-When it comes to choosing which namespaces to monitor, there are two options available:
+When it comes to choosing which namespaces to monitor, there are two options below that are available, and usage of ClusterAgent configuration file (`custer-agent.yaml`) recommended to be used whenever possible.
 
 ### a) From the Controller UI panel
 
@@ -190,7 +209,6 @@ When it comes to choosing which namespaces to monitor, there are two options ava
 3) Add or remove namespaces/projects
 
 ![UI namespaces](https://user-images.githubusercontent.com/23483887/101017420-fb59d380-3561-11eb-94a0-63aaf830151f.png)
-
 
 ### b) Using Cluster Agent configuration (recommended)
 
@@ -225,7 +243,6 @@ Correlation of APM agents and Cluster Agent depends on deployment techniquie pre
 It enables a direct link between Cluster agent monitored Pod and APM application in AppDynamics Applications. When successful, a link similar to this appears in Cluster Agent view:
 
 ![APM Correlation](https://user-images.githubusercontent.com/23483887/101019373-c8fda580-3564-11eb-8add-de67358eae6e.png)
-
 
 ## a) When you are using auto-instrumentation (recommended)
 
