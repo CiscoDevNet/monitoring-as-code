@@ -1,7 +1,6 @@
 # Monitoring Python Applications with AppDynamics
 
-
-# Preparation
+# 1. Preparation
 
 ## Check Supported Environments
 
@@ -10,13 +9,21 @@ Refer to the [documentation](https://docs.appdynamics.com/display/PRO45/Python+S
 "AppDynamics has tested the Python Agent on Tornado, Django, Flask, CherryPy, Bottle, and Pyramid.
 You can configure the agent to instrument any WSGI-based application or framework as Python Web [...]."
 
-## Create a project 
+## Create a project/namespace [Optional]
 
+Create a project/namespace that is going to contain application resources.
+
+OpenShift:
 ```
 oc new-project python-project
 ```
+Kubernetes:
+```
+kubectl create namespace python-project
+kubectl config set-context --current --namespace=python-project
+```
 
-## Service account
+## Service account [OpenShift only]
 
 A service account provides an identity for processes that run in a Pod. 
 https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
@@ -38,11 +45,16 @@ https://www.openshift.com/blog/managing-sccs-in-openshift
 
 Update YAML file to enable agent to connect to the controller, and apply to your project.
 
+Compete list of NodeJS agent settings can be found in the documentation [here](https://docs.appdynamics.com/display/PRO45/Node.js+Settings+Reference).
+
 ```
 oc apply -f python-agent-config-map.yml
 ```
+```
+kubectl apply -f python-agent-config-map.yml
+```
 
-# Deploy an Agent
+# 2. Deploy an Agent
 
 In this project as an underlying application we used Python app utilizing Flask framework, and it can be found in `python-flask-docker` folder of this project, or downloaded from https://github.com/lvthillo/python-flask-docker.git.
 
@@ -84,20 +96,15 @@ Refer to `python-deployment-no-image-updates.yml` file for a complete example.
 
 Agent configuration is applied as a ConfigMap and mounted as a volume.
 
-
 <img width="756" alt="python-config-volume-mount" src="https://user-images.githubusercontent.com/23483887/101621715-069f7a00-3a0e-11eb-97fb-aa2a98a32596.png">
 
 ```
 oc apply -f python-agent-config-map.yml
 ```
+```
+kubectl apply -f python-agent-config-map.yml
+```
 
 <img width="652" alt="python-config-configmap-as-volume" src="https://user-images.githubusercontent.com/23483887/101621816-26cf3900-3a0e-11eb-9319-7c0ed8bc745b.png">
-
-
-
-
-
-
-
 
 
