@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-app
+  labels:
+    appName: NodeJS-Deployment-App
+    name: appd-nodejs-deployment
+spec:
+  selector:
+    matchLabels:
+      name: nodejs-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: nodejs-app
+        app: appd-nodejs-deployment-auto
+        tier: backend
+    spec:
+      volumes:
+      - configMap:
+          name: appd-shim
+          defaultMode: 511
+        name: appd-shim
+      - configMap:
+          name: appd-start
+          defaultMode: 511
+        name: appd-start
+      containers:
+        - name: nodejs-app
+          image: alexappd/nodejs-docker-example:latest # application image
+          command:
+          - /bin/sh
+          - -c
+          - "export UNIQUE_HOST_ID=$(sed -rn '1s#.*/##; 1s/(.{12}).*/\\1/p' /proc/self/cgroup) && /usr/src/app/start.sh" #TODO override start command
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 300m
+              memory: 300M
+            requests:
+              cpu: 200m
+              memory: 200M
+          ports:
+          - containerPort: 3000
+          envFrom:
+          - configMapRef:
+              name: appd-nodejs-config
+          env:
+          - name: APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: appd-secrets
+                key: account-access-key
+          - name: APPDYNAMICS_AGENT_APPLICATION_NAME
+            value: K8s-NodeJS-Application
+          volumeMounts:
+          - name: appd-shim
+            mountPath: /usr/src/app/shim.js
+            subPath: shim.js
+          - name: appd-start
+            mountPath: /usr/src/app/start.sh
+            subPath: start.sh
+      restartPolicy: Always

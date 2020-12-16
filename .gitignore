@@ -5,3 +5,4 @@
 *appdynamics-cluster-agent-rhel-linux-20.9.0.1662
 local.*
 KubernetesExtensions/WithDependencies/apigee-monitoring-extension-3.2
+OpenShift/NodeJS/nodeapp

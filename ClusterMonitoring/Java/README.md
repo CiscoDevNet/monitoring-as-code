@@ -1,16 +1,24 @@
 
 # 1. Preparation steps for application and APM agent deployment
 
-## Create a project
+## Create a project/namespace
 
+Create a project/namespace that is going to contain application resources.
+
+OpenShift:
 ```
-oc new-project appd-dotnet-project
+oc new-project java-project
 ```
 
-![Projects](https://user-images.githubusercontent.com/23483887/101011897-a23a7180-355a-11eb-923c-764cf2a5792a.png)
+![java-project](https://user-images.githubusercontent.com/23483887/101358199-6a049d00-3892-11eb-92f7-72a019f1bdba.png)
 
+Kubernetes:
+```
+kubectl create namespace java-project
+kubectl config set-context --current --namespace=java-project
+```
 
-### Execute namespace permission fix
+### Execute namespace permission fix [OpenShift only]
 
 You either need to give the service account anyuid SCC or change the uid range for the project (appdynamics) to include 1001
 ``` 
@@ -22,12 +30,12 @@ https://www.openshift.com/blog/managing-sccs-in-openshift
 In case that project is still not visible from the OpenShift console,  add your currrent user (alice below) to project admins, for example:
 
 ```
-oc adm policy add-role-to-user admin alice -n appd-dotnet-project
+oc adm policy add-role-to-user admin alice -n java-project
 ```
 
 ## Deploy secrets
 
-Provide the value of account-access-key as base64 encoded string, and apply the secrets file.
+Provide the value of `account-access-key` as base64 encoded string, and apply the secrets file.
 
 To encode a secret:
 ```
@@ -43,27 +51,34 @@ oc apply -f dotnet-appd-secrets.yaml
 ```
 
 If created successfully, secret is going to be visible in the OpenShift project resources as well:
-![Secrets](https://user-images.githubusercontent.com/23483887/101013432-2e00cd80-355c-11eb-9cf9-2a87fb884a76.png)
+![java-secret](https://user-images.githubusercontent.com/23483887/101352557-3de51e00-388a-11eb-8701-ac0931379822.png)
+
+```
+kubectl apply -f dotnet-appd-secrets.yaml -n java-project
+```
 
 ## Deploy ConfigMap
 
 A ConfigMap is an API object used to store non-confidential data in key-value pairs. Pods can consume ConfigMaps as environment variables, command-line arguments, or as configuration files in a volume.
 
-A ConfigMap allows you to decouple environment-specific configuration from your container images, so that your applications are easily portable.
+A [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/) allows you to decouple environment-specific configuration from your container images, so that your applications are easily portable.
 
-https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
+Compete list of environment variabels can eb found in the documentation [here](https://docs.appdynamics.com/display/PRO45/Java+Agent+Configuration+Properties).
 
 Provide environment variable values in plaintext format and apply to a cluster.
 
 ```
 oc apply -f dotnet-config-map.yaml
 ```
-
 You should be seeing created ConfigMap in resources:
 
-![ConfigMap](https://user-images.githubusercontent.com/23483887/101013219-da8e7f80-355b-11eb-923d-93d87c5f9f8b.png)
+![java-config](https://user-images.githubusercontent.com/23483887/101352544-3887d380-388a-11eb-84f2-17c8d48f195d.png)
 
-## Service account
+```
+kubectl apply -f dotnet-config-map.yaml
+```
+
+## Service account [OpenShift only]
 
 A service account provides an identity for processes that run in a Pod. 
 https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
@@ -81,11 +96,10 @@ oc adm policy add-scc-to-user anyuid -z appd-account
 `anyuid` - the equivalent as allowing UID 0, or root user, both inside and outside the container
 https://www.openshift.com/blog/managing-sccs-in-openshift
 
-
 # 2. Deploy application
 Deploy Pods or Deployments, instrument with AppD agents using init containers (init-cont.yml) or auto-instrumentation (auto-instr.yml):
 
-## a) Use init containers
+## a) Use init containers (OpenShift 3.x version)
 
 Init containers are an option available in Kubernetes environments to run additional containers at startup time that help initialize an application.
 
@@ -94,15 +108,16 @@ Appdynamics provides APM agent images in the [Docker Hub](https://hub.docker.com
 In the repo, examples of how to use init containers with Deployments:
 
 ```
-oc apply -f dotnet-deployment-init-cont.yml
+oc apply -f java-deployment-init-cont.yml
 ```
-sa well as Pods:
-
 ```
-oc apply -f dotnet-pod-init-cont.yml
+kubectl apply -f java-deployment-init-cont.yml -n java-project
 ```
 
-## b) Use auto-instrumentation (recommended)
+Note that UNIQUE_HOST_ID is used to correlate APM agent and Cluster agent metrics.
+Java Cluster Agent correlation documentation can be found [here](https://docs.appdynamics.com/display/PRO45/Configure+App+Agents+to+Correlate+with+Cluster+Agent).
+
+## b) Use auto-instrumentation (recommended, OpenShift 4.x version)
 
 With the Cluster Agent, you can auto-instrument containerized apps. Auto-instrumentation leverages Kubernetes init containers to instrument Kubernetes applications.
 
@@ -115,23 +130,28 @@ You can auto-instrument:
 
 [Requirements and Supported environments](https://docs.appdynamics.com/display/PRO45/Cluster+Agent+Requirements+and+Supported+Environments)
 
+Auto-instrumentation is then enabled by adding auto-instrumentation config section in `cluster-agent.yaml` file, and Cluster Agent automatically and dynamically applies the configuration changes to all applications in the cluster. An example of cluster agent configuration:
+
+<img width="716" alt="java-auto-instr-config" src="https://user-images.githubusercontent.com/23483887/101358664-147cc000-3893-11eb-9828-a94885403269.png">
+
+Refer to our documentation for all of the auto-instrumentation parameters explained in detail [Auto-Instrumentation Parameters](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications).
+
+Complete documentation about Cluster Agent auto-instrumentation can be found [here](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications).
+
 In this scenario, you only deploy an application in a usual manner, without the need to change any of the manifests, and the example is provided in the file below:
 
 ```
-oc apply -f dotnet-deployment-auto-instr.yml
+oc apply -f java-deployment-auto-instr.yml
 ```
-
-Auto-instrumentation is then enabled by adding auto-instrumentation config section in `cluster-agent.yaml` file, and Cluster Agent automatically and dynamically applies the configuration changes to all applications in the cluster. An example of cluster agent configuration:
-
-<img width="598" alt="Auto-Instrumentation Config Example" src="https://user-images.githubusercontent.com/23483887/101016659-02ccad00-3561-11eb-8217-f8cd217b6c88.png">
-
-Refer to our documentation for all of the auto-instrumentation parameters explained in detail [Auto-Instrumentation Parameters](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications#EnableAuto-InstrumentationofSupportedApplications-config).
-
-Complete documentation about Cluster Agent auto-instrumentation can be found [here](https://docs.appdynamics.com/display/PRO45/Enable+Auto-Instrumentation+of+Supported+Applications).
+```
+kubectl apply -f java-deployment-auto-instr.yml
+```
 
 Note: Auto-instrumentation is available for Deployments only, for pods use init-containers.
 
 # 3. Set namespaces/projects to monitor
+
+When it comes to choosing which namespaces to monitor, there are two options below that are available, and usage of ClusterAgent configuration file (`custer-agent.yaml`) recommended to be used whenever possible.
 
 ## Include-exclude namespaces
 
@@ -139,12 +159,11 @@ When it comes to choosing which namespaces to monitor, there are two options ava
 
 ### a) From the Controller UI panel
 
-1) In the upper-right corner, click the Settings icon  > AppDynamics Agents.
+1) In the upper-right corner, click the Settings icon > AppDynamics Agents.
 2) Select the Cluster Agents tab to display a list of clusters. Click Configure.
 3) Add or remove namespaces/projects
 
 ![UI namespaces](https://user-images.githubusercontent.com/23483887/101017420-fb59d380-3561-11eb-94a0-63aaf830151f.png)
-
 
 ### b) Using Cluster Agent configuration (recommended)
 
@@ -178,7 +197,7 @@ Correlation of APM agents and Cluster Agent depends on deployment techniquie pre
 
 It enables a direct link between Cluster agent monitored Pod and APM application in AppDynamics Applications. When successful, a link similar to this appears in Cluster Agent view:
 
-![APM Correlation](https://user-images.githubusercontent.com/23483887/101019373-c8fda580-3564-11eb-8add-de67358eae6e.png)
+![java-pod](https://user-images.githubusercontent.com/23483887/101352608-548b7500-388a-11eb-8d05-6f21e31ff18b.png)
 
 ## a) When you are using init containers
 

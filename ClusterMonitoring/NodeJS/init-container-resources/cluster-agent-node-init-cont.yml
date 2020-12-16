@@ -1,0 +1,12 @@
+apiVersion: appdynamics.com/v1alpha1
+kind: Clusteragent
+metadata:
+  name: k8s-cluster-agent
+  namespace: appdynamics
+spec:
+  controllerUrl: "http://nwmaas-20100nosshcontr-r6y4tftd.appd-cx.com:8090"
+  account: "customer1"
+  appName: "K8s-Cluster"
+  serviceAccountName: appdynamics-cluster-agent
+  image: "docker.io/appdynamics/cluster-agent:20.11.0"
+  nsToMonitor: [appdynamics,default,dev]
