@@ -85,7 +85,7 @@ In order to run an image n a cluster, we are going to need a manifest file that 
 
 Update #todo section, reference your image built and pushed to the image repo:
 
-`kubernetes-manifests/apigee-extension-pod.yml`
+`kubernetes-manifests/machine-agent-extension-pod.yml`
 
 or create a pod definition:
 
@@ -98,5 +98,5 @@ kubectl run machine-agent-extension --image=<image-name-here> --dry-run=client -
 Apply changes to the cluster:
 
 ```
-kubectl apply -f kubernetes-manifests/machine-agent-extension.yml
+kubectl apply -f kubernetes-manifests/machine-agent-extension-pod.yml
 ```
