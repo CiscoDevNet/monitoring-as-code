@@ -1,8 +1,10 @@
 # start from a base image
 FROM curlimages/curl as build
 
-# set environment variables
-ENV EXTENSION_SOURCE_FILE_NAME apigee-monitoring-extension-3.2.zip
+# environment variables
+#todo - update based on extension name
+ENV EXTENSION_SOURCE_FILE_NAME apigee-monitoring-extension-3.2.zip 
+
 ENV EXTENSION_CONTAINER_DIRECTORY /tmp/appd-extension
 
 # copy files from local file system
@@ -22,7 +24,8 @@ ENV EXTENSION_CONTAINER_DIRECTORY /tmp/appd-extension
 
 WORKDIR $APPD_DIRECTORY
 
-# install dependencies needed to run an extension
+# install dependencies needed to run an extension 
+#todo - update based on extension dependencies
 RUN apt update -y && \
   apt install jq -y && \
   apt install curl -y
