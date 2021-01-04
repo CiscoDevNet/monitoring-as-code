@@ -6,3 +6,5 @@
 local.*
 KubernetesExtensions/WithDependencies/apigee-monitoring-extension-3.2
 OpenShift/NodeJS/nodeapp
+RabbitMQMonitor
+*.go
