@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: machine-agent
+  name: machine-agent
+spec:
+  volumes:
+    - name: appd-extension-volume
+      emptyDir:
+        {}
+    - name: extension-config-volume
+      configMap:
+        name: extension-config
+  initContainers:
+  - image: curlimages/curl:latest # init container
+    name: appd-extension
+    command:
+    - "/bin/sh"
+    - "-c"
+    args:
+    - > 
+      mkdir tmp/appdynamics &&
+      curl -o tmp/appdynamics/extension.zip -X GET $EXTENSION_URL -k &&
+      unzip -j tmp/appdynamics/extension.zip -d /opt/appdynamics -x '__MACOSX/*'
+    imagePullPolicy: Always
+    env:
+      - name: EXTENSION_URL
+        value: "https://www.appdynamics.com/media/uploaded-files/1602049801/rabbitmqmonitor-2.0.4.zip" #todo replace with extension URL
+    volumeMounts:
+      - mountPath: /opt/appdynamics
+        name: appd-extension-volume
+  containers:
+  - image: appdynamics/machine-agent-analytics:20.8.0 # machine agent as a base
+    name: machine-agent
+    resources: 
+      limits:
+        cpu: 200m
+        memory: 200M
+      requests:
+        cpu: 100m
+        memory: 200M
+    envFrom:
+      - configMapRef:
+          name: appd-ma-config
+    env:
+      - name: APPDYNAMICS_AGENT_APPLICATION_NAME
+        value: Machine-agent-extension-app  #todo replace with application name
+      - name: APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY
+        valueFrom:
+          secretKeyRef:
+            key: account-access-key
+            name: appd-secrets 
+    volumeMounts:
+      - name: appd-extension-volume # extension files
+        mountPath: /opt/appdynamics/monitors/machine-agent-extension
+      - name: extension-config-volume # extension configuration
+        mountPath: /opt/appdynamics/monitors/machine-agent-extension/config.yml
+        subPath: config.yml
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
