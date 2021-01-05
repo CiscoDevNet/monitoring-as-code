@@ -54,9 +54,9 @@ docker build -t "${handle}/${image_name}:${image_tag}" . --no-cache
 # 4. Push Docker image to JFrog Artifactory
 # docs: https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-PushingDockerImagesUsingtheDockerClient
 
-jfrog rt docker-push "${handle}/${image_name}:${image_tag}" $jfrog_repo --url="https://$jfrog_server/artifactory" --user="$jfrog_user" --apikey="$jfrog_apikey"
+jfrog rt docker-push "${handle}/${image_name}:${image_tag}" ${jfrog_repo} --url="https://${jfrog_server}/artifactory" --user="${jfrog_user}" --apikey="${jfrog_apikey}"
 
 # 5. Pull images
 # docs: https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-PullingDockerImagesUsingtheDockerClient
 
-jfrog rt docker-pull "${handle}/${image_name}:${image_tag}" $jfrog_repo --url="https://$jfrog_server/artifactory" --user="$jfrog_user" --apikey="$jfrog_apikey"
+jfrog rt docker-pull "${handle}/${image_name}:${image_tag}" "${jfrog_repo}" --url="https://${jfrog_server}/artifactory" --user="${jfrog_user}" --apikey="${jfrog_apikey}"
