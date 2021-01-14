@@ -6,7 +6,7 @@ Please note that screenshots are taken for the .NET Core application Stack, howe
 
 ## Preparation
 
-### Create Secrets
+### Create Secrets [Optional]
 
 We are using AWS Secret Manager as a secrets management service, where we are storing AppDynamics Controller's access key.
 
@@ -22,7 +22,7 @@ Keep note of the *Secret ARN* created as we are going to need this value later o
 
 ![aws-secret-arn](https://user-images.githubusercontent.com/23483887/101660379-04094880-3a3f-11eb-9318-21cbfa9edb5f.png)
 
-### Create Log Group (optional)
+### Create Log Group [Optional]
 
 In case that all of the logs are produced in a specific ECS environment, you would like to keep under a single Log Group in CloudWatch, follow the next steps. Also, you may reuse an existing Log Group if applicable.
 
