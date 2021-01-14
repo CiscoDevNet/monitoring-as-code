@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: An CloudFormation template for Fargate. Creates Task Definition running Java application and Appdynamics java agent images.
+Description: An CloudFormation template for Fargate. Creates Task Definition running .NET Core application and Appdynamics .NET core agent images.
 Parameters:
-  JavaApplicationImage:
+  DotnetApplicationImage:
     Type: String
     Default: mcr.microsoft.com/dotnet/core/samples:aspnetapp
   AppdAgentImage:
@@ -12,7 +12,7 @@ Parameters:
     Default: DotNetCoreHelloWorldApp
   AppdAgentServiceName:
     Type: String
-    Default: AppdJavaAgent
+    Default: AppdDotnetAgent
   ContainerPort:
     Type: Number
     Default: 80
@@ -107,7 +107,7 @@ Resources:
         name: 'appd-agent-volume'
       ContainerDefinitions:
         - Name: !Ref ApplicationServiceName
-          Image: !Ref JavaApplicationImage
+          Image: !Ref DotnetApplicationImage
           PortMappings:
             - containerPort: !Ref ContainerPort 
               hostPort: !Ref HostPort 
