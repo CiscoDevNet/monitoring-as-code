@@ -1,0 +1,34 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetRole",
+                "iam:TagRole",
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:AttachRolePolicy",
+                "iam:PutRolePolicy",
+                "ecs:DeregisterTaskDefinition",
+                "iam:PassRole",
+                "iam:DetachRolePolicy",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeSecurityGroups",
+                "ec2:CreateSecurityGroup",
+                "ec2:DeleteSecurityGroup",
+                "ecs:RegisterTaskDefinition",
+                "ec2:DescribeSubnets",
+                "ecs:DescribeServices",
+                "ecs:CreateService",
+                "ecs:DeleteService",
+                "ecs:DescribeClusters",
+                "ecs:CreateCluster",
+                "ecs:DeleteCluster",
+                "ec2:AuthorizeSecurityGroupIngress"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
