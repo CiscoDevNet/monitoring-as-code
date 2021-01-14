@@ -7,9 +7,9 @@ Parameters:
   AppdAgentImage:
     Type: String
     Default: appdynamics/dotnet-core-agent:20.7.0
-  ApplicationServiceName:
+  ServiceName:
     Type: String
-    Default: DotNetCoreHelloWorldApp
+    Default: DotNetCoreApp
   AppdAgentServiceName:
     Type: String
     Default: AppdDotnetAgent
@@ -19,23 +19,23 @@ Parameters:
   HostPort:
     Type: Number
     Default: 80 # When networkMode=awsvpc, the host ports and container ports in port mappings must match
-  # logs
-  LogGroup:
-    Type: String
-    Default: testTask # TODO LogGroup needs to exist in CloudWatch (remove logConfiguration if logs are not to be used)
-  LogRegion:
-    Type: String
-    Default: eu-west-2
-  LogPrefix:
-    Type: String
-    Default: DotNetApp
+  # # logs
+  # LogGroup:
+  #   Type: String
+  #   Default: testTask # TODO LogGroup needs to exist in CloudWatch (remove logConfiguration if logs are not to be used)
+  # LogRegion:
+  #   Type: String
+  #   Default: eu-west-2
+  # LogPrefix:
+  #   Type: String
+  #   Default: DotNetApp
   # secrets
   AppDSecretAccessKey:
     Type: String
     Default: arn:aws:secretsmanager:eu-west-2:032263611943:secret:APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY-oFRoeE
-  PolicyGetSecrets:
-    Type: String
-    Default: arn:aws:iam::032263611943:policy/AppdynamicsAgentGetSecretsPolicy
+  # PolicyGetSecrets:
+  #   Type: String
+  #   Default: arn:aws:iam::00000000000:policy/AppdynamicsAgentGetSecretsPolicy
   # AppD properties
   AppDControllerHost:
     Type: String
@@ -74,12 +74,18 @@ Parameters:
     Type: String
     Default: /opt/appdynamics-agent/dotnet/libappdprofiler.so
 Resources:
+  TaskLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ['', [/ecs/, !Ref ServiceName, LogGroup]]
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
+    DependsOn: 
+      - TaskLogGroup
     DeletionPolicy: Delete
     Properties:
       # Name of the task definition. Subsequent versions of the task definition are grouped together under this name.
-      Family: !Join ['', [!Ref ApplicationServiceName, TaskDefinition]]
+      Family: !Join ['', [!Ref ServiceName, TaskDefinition]]
       # awsvpc is required for Fargate
       NetworkMode: awsvpc
       RequiresCompatibilities:
@@ -106,7 +112,7 @@ Resources:
       - host: {}
         name: 'appd-agent-volume'
       ContainerDefinitions:
-        - Name: !Ref ApplicationServiceName
+        - Name: !Ref ServiceName
           Image: !Ref DotnetApplicationImage
           PortMappings:
             - containerPort: !Ref ContainerPort 
@@ -127,9 +133,9 @@ Resources:
           logConfiguration: # The log configuration specification for the container.
             logDriver: awslogs  # [REQUIRED] The log driver to use for the container. Valid values are: json-file, syslog, journald, gelf, fluentd, awslogs, splunk, awsfirelens.
             options: # The configuration options to send to the log driver.
-              awslogs-group: !Ref LogGroup
-              awslogs-region: !Ref LogRegion
-              awslogs-stream-prefix: !Ref LogPrefix
+              awslogs-group: !Ref TaskLogGroup 
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
           secrets: # The secrets to pass to the container.
           - name: 'APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY'  # [REQUIRED] The name of the secret.
             valueFrom: !Ref AppDSecretAccessKey
@@ -156,8 +162,6 @@ Resources:
             value: !Ref CoreClrEnableProfiling
           - name: CORECLR_PROFILER_PATH
             value: !Ref CoreClrProfilerPath
-          #- name: LD_LIBRARY_PATH
-          #  value: /opt/appdynamics-agent/dotnet
         - Name: !Ref AppdAgentServiceName
           Image: !Ref AppdAgentImage
           Essential: false 
@@ -173,8 +177,10 @@ Resources:
   ExecutionRole:
     Type: AWS::IAM::Role
     DeletionPolicy: Delete
+    DependsOn:
+      - PolicyGetSecrets
     Properties:
-      RoleName: !Join ['', [!Ref ApplicationServiceName, ExecutionRole]]
+      RoleName: !Join ['', [!Ref ServiceName, ExecutionRole]]
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
@@ -189,16 +195,26 @@ Resources:
     Type: AWS::IAM::Role
     DeletionPolicy: Delete
     Properties:
-      RoleName: !Join ['', [!Ref ApplicationServiceName, TaskRole]]
+      RoleName: !Join ['', [!Ref ServiceName, TaskRole]]
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
             Principal:
               Service: ecs-tasks.amazonaws.com
             Action: 'sts:AssumeRole'
-      # ManagedPolicyArns:
-      #   -
-      # Policies:
-      #   -
+  # Policy for fetching secrets
+  PolicyGetSecrets:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Join ['', [!Ref ServiceName, SecretsPolicy]]
+      Description: Policy for fetching aws secrets from secret manager
+      Path: /
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: 'secretsmanager:GetSecretValue'
+            Resource: 
+                - !Ref AppDSecretAccessKey
 
 
