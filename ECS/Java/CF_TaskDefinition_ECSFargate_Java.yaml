@@ -9,7 +9,7 @@ Parameters:
     Default: appdynamics/java-agent:20.8.0
   ApplicationServiceName:
     Type: String
-    Default: JavaHelloWorldApp
+    Default: JavaHelloWorldAppECS
   AppdAgentServiceName:
     Type: String
     Default: AppdJavaAgent
@@ -19,7 +19,7 @@ Parameters:
   # logs
   LogGroup:
     Type: String
-    Default: testTask # TODO LogGroup needs to exist in CloudWatch (remove logConfiguration if logs are not to be used)
+    Default: /ecs/appd/java # TODO LogGroup needs to exist in CloudWatch (remove logConfiguration if logs are not to be used)
   LogRegion:
     Type: String
     Default: eu-west-2
@@ -29,24 +29,24 @@ Parameters:
   # secrets
   AppDSecretAccessKey:
     Type: String
-    Default: arn:aws:secretsmanager:eu-west-2:032263611943:secret:APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY-oFRoeE
+    Default: arn:aws:secretsmanager:eu-west-2:181357337174:secret:APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY_FIELD-XO3wt4
   PolicyGetSecrets:
     Type: String
-    Default: arn:aws:iam::032263611943:policy/AppdynamicsAgentGetSecretsPolicy
+    Default: arn:aws:iam::181357337174:policy/AppdynamicsAgentGetSecretsPolicy
   # AppD properties
   AppDControllerHost:
     Type: String
-    Default: nwmaas-2081nosshcontro-dw1rwn6a.appd-cx.com
+    Default: fieldlabs.saas.appdynamics.com
   AppDControllerPort:
     Type: Number
-    Default: 8090
+    Default: 443
   AppDControllerSslEnabled:
     Type: String
-    Default: false
+    Default: true
     AllowedValues: [true, false]
   AppDAgentAccountName:
     Type: String
-    Default: customer1
+    Default: fieldlabs
   AppDAgentApplicationName:
     Type: String
     Default: ECS-Fargate-Java
