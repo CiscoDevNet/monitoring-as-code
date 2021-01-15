@@ -37,7 +37,8 @@
                 "ec2:DescribeSubnets",
                 "secretsmanager:CreateSecret",
                 "secretsmanager:TagResource",
-                "secretsmanager:DeleteSecret"
+                "secretsmanager:DeleteSecret",
+                "ec2:RevokeSecurityGroupIngress"
             ],
             "Resource": "*"
         }
