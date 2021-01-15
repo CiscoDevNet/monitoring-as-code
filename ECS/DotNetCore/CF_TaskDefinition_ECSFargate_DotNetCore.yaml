@@ -19,23 +19,10 @@ Parameters:
   HostPort:
     Type: Number
     Default: 80 # When networkMode=awsvpc, the host ports and container ports in port mappings must match
-  # # logs
-  # LogGroup:
-  #   Type: String
-  #   Default: testTask # TODO LogGroup needs to exist in CloudWatch (remove logConfiguration if logs are not to be used)
-  # LogRegion:
-  #   Type: String
-  #   Default: eu-west-2
-  # LogPrefix:
-  #   Type: String
-  #   Default: DotNetApp
   # secrets
   AppDSecretAccessKey:
     Type: String
-    Default: arn:aws:secretsmanager:eu-west-2:032263611943:secret:APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY-oFRoeE
-  # PolicyGetSecrets:
-  #   Type: String
-  #   Default: arn:aws:iam::00000000000:policy/AppdynamicsAgentGetSecretsPolicy
+    Default: arn:aws:secretsmanager:eu-west-2:032263611943:secret:APPDYNAMICS_ACCOUNT_ACCESS_KEY-Gb3Xli
   # AppD properties
   AppDControllerHost:
     Type: String
