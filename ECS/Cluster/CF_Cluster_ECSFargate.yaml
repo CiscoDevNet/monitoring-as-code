@@ -9,10 +9,10 @@ Parameters:
     Type: AWS::EC2::Subnet::Id
   ServiceName:
     Type: String
-    Default: MyService # todo update with the name of the service
+    Default: DotNetCore # todo update with the name of the service
   TaskDefinition:
     Type: String
-    Default: DotNetCoreHelloWorldAppTaskDefinition # todo update with the name of the task definition
+    Default: DotNetCoreAppTaskDefinition # todo update with the name of the task definition
   ContainerPort:
     Type: Number
     Default: 80
