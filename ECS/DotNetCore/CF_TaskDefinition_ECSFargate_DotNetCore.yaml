@@ -203,5 +203,8 @@ Resources:
             Action: 'secretsmanager:GetSecretValue'
             Resource: 
                 - !Ref AppDSecretAccessKey
-
+Outputs:
+  TaskDefinitionArn:
+    Description: Task definition
+    Value: !Ref TaskDefinition
 
