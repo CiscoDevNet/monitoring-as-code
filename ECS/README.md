@@ -6,29 +6,39 @@ Please note that screenshots are taken for the .NET Core application Stack, howe
 
 ## Preparation
 
-### Create Secrets [Optional]
+Creating resources is going to be performed by using *ClouFormation* service, that can be accessed from AWS cosnole:
+
+![cloud_formation](https://user-images.githubusercontent.com/23483887/104907306-c8866600-597c-11eb-9ed9-b116523ab14f.png)
+
+CloudFormation is AWS tool of choice for achieving infrastructure-as-a-code (Iaas) as it gains popularity with stability, consistency and cost reduction it accompanies.
+
+CloudFormation provides infrastructure on AWS by utilizing *Templates* representing a collection of resource definitions that make up a *Stack*. As templates are nothing but YAML or JSON files that can be handled any text editor, easy to understand by humans and machines, and that easily can be version controlled.
+
+Note that using CloudFormation service is free, but you are paying for the resources that you create in the process.
+
+Here, new resources ar going to be created:
+
+![create_stack](https://user-images.githubusercontent.com/23483887/104905300-10f05480-597a-11eb-9fa1-1610104a79c6.png)
+
+And since templates are already provided, they can be uploaded from a computer location:
+
+![create_stack_prepare_template](https://user-images.githubusercontent.com/23483887/104908327-3a12e400-597e-11eb-9cef-f65219f7d0f3.png)
+
+Alternatively, you can upload templates to S3 bucket and fetch them from there.
+
+### Create Secrets
 
 We are using AWS Secret Manager as a secrets management service, where we are storing AppDynamics Controller's access key.
 
-Store the value as plaintext, without quotes, as that is going to be a value of our environment variable.
+Secret value is stored as a as plaintext, without quotes, as that is going to be a value of our environment variable.
 
-![aws-secret-create](https://user-images.githubusercontent.com/23483887/101659141-a294aa00-3a3d-11eb-8890-45de5af81174.png)
+For this purpose, CloudFormation template is provided in "ECS/Common/CF_Secret_ECSFargate.yaml"
 
-We named this variable `APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY_STAGING`.
+When uploading a template, update the value of `AppdAccountSecretKey` to match your controller's value. There is an option to update the secret key, but note that in that case application templates should be updates as well in order to fetch this new key by name.
 
-![aws-secret-name](https://user-images.githubusercontent.com/23483887/101659151-a45e6d80-3a3d-11eb-8e3f-054e94dd124e.png)
-
-Keep note of the *Secret ARN* created as we are going to need this value later on.
+When secret gets's created keep note of the *Secret ARN* created as we are going to need this value later on.
 
 ![aws-secret-arn](https://user-images.githubusercontent.com/23483887/101660379-04094880-3a3f-11eb-9318-21cbfa9edb5f.png)
-
-### Create Log Group [Optional]
-
-In case that all of the logs are produced in a specific ECS environment, you would like to keep under a single Log Group in CloudWatch, follow the next steps. Also, you may reuse an existing Log Group if applicable.
-
-A log group is a group of log streams that share the same retention, monitoring, and access control settings. More about Log Groups and Log Streams can also be found [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html).
-
-![CloudWatch-Management-Console-DotNet-Log-Group](https://user-images.githubusercontent.com/23483887/101661164-dffa3700-3a3f-11eb-85b7-31e30e528b9d.png)
 
 ### IAM Policies and Roles
 
@@ -42,31 +52,19 @@ We are going to need to be allowed to fetch the created secret, and in case that
 
 An IAM role is an IAM identity that you can create in your account that has specific permissions. More about IAM Roles can be found [here](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html).
 
-#### Secrets Policy
-
-In order to be able to enable APM agent to get created secrets' value, we need to create a policy that enables this action on the AWS Secret Manager resource, that is going to be previously created Secret ARN.
-
-The following policy document `get-secrets-policy.json`, can be added to your AWS account manually through AWS Console (IAM > Policies > Create Policy), or by using AWS CLI and executing a script `get-secrets-policy-create.sh`.
-
-Please note that the Resource element's value need sot be updated with your account's Secret ARN (make sure that region and account number are correct), and in case that you are using CLI, it needs to be configured - AWS [documentation](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) provides step-by-step guidance on how to do that.
-
-Upon successful creation, take a note of *Secret Policy ARN* and proceed to the next steps. This value is going to be returned in the API response in case you used AWS CLI, or can be found in AWS Console in IAM > Policies > [select policy] > [copy Policy ARN].
-
 #### CloudFormation Policy and Role
 
-In order to assign permissions, following the least-privilege principle, in `cloud-formation-policy.json` file a policy is defined that needs at least to be assigned to a CloudFormation role in order for it to be able to create, delete, get and modify resources to deploy desired applications and their dependencies.
+In order to assign permissions, following the least-privilege principle, in `ECS/Common/cf-cluster-cloud-formation-policy.json` file a policy is defined that needs at least to be assigned to a CloudFormation role in order for it to be able to create, delete, get and modify resources to deploy desired applications and their dependencies.
 
 Create a policy, manually in AWS Console (IAM > Policies > Create Policy) or using an AWS CLI (file `cloud-formation-policy-create.sh`).
 
 Attach the policy to an existing CloudFormation role (IAM > Roles > [select role] > Attach Policies), or create a new one (IAM > Roles > Create role) and follow the same principle. Here also you can utilise an AWS CLI functionality (refer to `cloud-formation-policy-create.sh`).
 
-## Review and Update CloudFormation Template
+## Create monitored application's Task Definition
 
-CloudFormation template can be found in the following file: `CF_TaskDefinition_ECSFargate_DotNetCore.yaml`.
+CloudFormation template of a .NET Core application can be found in the following file: `ECS/DotNetCore/CF_TaskDefinition_ECSFargate_DotNetCore.yaml`.
 
 Example application provided in the template is ready to go and provision Microsoft .NET Core application (configurable in next step) alongside with AppDynamics agent in ECS as an AWS Serverless Fargate resource, and here before creating a stack you can review and update non-parametrized fields.
-
-In this step, remove `LogGroup` in case that CloudWatch Log Groups are not to be used before proceeding to the next steps.
 
 Learn more about [Task definition properties](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecs-taskdefinition.html).
 
@@ -82,8 +80,6 @@ To name the stack, provide intuitive naming at the top of the screen:
 
 In the same step, update parameters, besides controller connection details, make sure to update the following fields:
 - `AppDSecretAccessKey` - value should be *Secret ARN* 
-- `PolicyGetSecrets` - value should be *Secret Policy ARN*
-- `LogGroup`, `LogPrefix`, `LogRegion` - CloudWatch Log Group details
 
 ![CloudFormation-Parameters](https://user-images.githubusercontent.com/23483887/101676355-f8c01800-3a52-11eb-84f9-07ba9a91c999.png)
 
