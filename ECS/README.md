@@ -85,6 +85,8 @@ In the same step, update parameters, besides controller connection details, make
 
 Here, note that `ServiceName` is going to determine your Task definition name, so set it accordingly, and bear in mind that to this name "TaskDefinition" string is going to be appended at the end to form a Task definition name.
 
+![ecs-service-name](https://user-images.githubusercontent.com/23483887/104922808-1908be00-5993-11eb-8544-e2a03f2e7411.png)
+
 In the next step, make sure to assign an IAM Role that has enough permissions to create template resources (refer to CloudFormation Policy and Role):
 
 ![CloudFormation-Role](https://user-images.githubusercontent.com/23483887/101676585-43da2b00-3a53-11eb-8449-65964d507dd3.png)
