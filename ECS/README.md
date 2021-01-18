@@ -70,7 +70,7 @@ Learn more about [Task definition properties](https://docs.aws.amazon.com/AWSClo
 
 ## Execute CloudFormation Stack 
 
-Navigate to CloudFormation Service and create a Stack, pick an option to do so from an existing resource, as we already have a template provided `CF_TaskDefinition_ECSFargate_DotNetCore.yaml`.
+Navigate to CloudFormation Service and create a Stack, pick an option to do so from an existing resource, as we already have a template provided `ECS/DotNetCore/CF_TaskDefinition_ECSFargate_DotNetCore.yaml`.
 
 ![CloudFormation-CreateStack](https://user-images.githubusercontent.com/23483887/101669603-1341c380-3a4a-11eb-947c-4c540032391e.png)
 
@@ -78,12 +78,12 @@ To name the stack, provide intuitive naming at the top of the screen:
 
 ![CloudFormation-NameStack](https://user-images.githubusercontent.com/23483887/101670344-f1950c00-3a4a-11eb-9213-9780fdb39454.png)
 
-In the same step, update parameters, besides controller connection details, make sure to update the following fields:
-- `AppDSecretAccessKey` - value should be *Secret ARN* 
+In the same step, update parameters, besides controller connection details, make sure to update at least the following field:
+- `AppDSecretAccessKey` - value should be *Secret ARN* of a secret created in "Create Secrets" section.
 
 ![CloudFormation-Parameters](https://user-images.githubusercontent.com/23483887/101676355-f8c01800-3a52-11eb-84f9-07ba9a91c999.png)
 
-Here, note that `ApplicationServiceName` is going to determine your Task definition name, so set it accordingly, and bear in mind that to this name "TaskDefinition" string is going to be appended at the end to form a Task definition name.
+Here, note that `ServiceName` is going to determine your Task definition name, so set it accordingly, and bear in mind that to this name "TaskDefinition" string is going to be appended at the end to form a Task definition name.
 
 In the next step, make sure to assign an IAM Role that has enough permissions to create template resources (refer to CloudFormation Policy and Role):
 
@@ -97,24 +97,17 @@ Stack Events can be observed and when status changes to UPDATE_COMPLETED, procee
 
 ![CloudFormation-Created](https://user-images.githubusercontent.com/23483887/101676729-771cba00-3a53-11eb-83e2-4150293adc32.png)
 
-## Run Task
 
-Navigate to Elastic Container Service (ECS) > Task Definitions in AWS Console, and find a Task named as `ApplicationServiceName` + TaskDefinition of the used Stack. 
+## Create a Fargate Cluster and run a Task
 
 "Task definitions specify the container information for your application, such as how many containers are part of your task, what resources they will use, how they are linked together, and which host ports they will use." [learn more](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html)
 
-Create an ECS cluster there if there are no suitable ones already, by selecting Clusters from the left-hand side menu > Create Cluster > Networking Only > [provide name].
+In order to run a Task Definition that we created in previous step, we are going to create a Fargate (Serverless) Cluster and run a Service based on Task Definition. 
 
-Now, you can run a Task:
+Import the template from `ECS/Common/CF_Cluster_ECSFargate.yaml`, that is creating a Cluster and starting a Service based on `TaskDefinition` name provided. It also creates a Security Group and opens a port of the appplication inisde a container, so it can be accessed from the internet.
 
-![ECS-TaskDefinition-Run](https://user-images.githubusercontent.com/23483887/101673199-c7454d80-3a4e-11eb-8553-931439a2a15e.png)
+In order to observe the created resources navigate to Elastic Container Service (ECS) service:
 
-Configure Service parameters:
-- Launch type - Fargate,
-- Cluster - pick a cluster from a drop-down,
-- Service name - good practice is to be `ApplicationServiceName` + Service,
-- Number of tasks - number of times to spin an application, can be 1,
-- Cluster VPC - Virtual Private Cloud where the service is going to run, can be the default for testing purposes,
-- Auto-assign public IP - Enabled -in case that your application needs to have an accessible IP address.
+![ecs_service](https://user-images.githubusercontent.com/23483887/104918727-15723880-598d-11eb-9ed1-1f33373ef0bb.png)
 
-Create a Service and take note of the Security Group in case that application ports need to be open and Security Group Inbound rules to be added.
+
