@@ -106,10 +106,18 @@ Stack Events can be observed and when status changes to UPDATE_COMPLETED, procee
 
 In order to run a Task Definition that we created in previous step, we are going to create a Fargate (Serverless) Cluster and run a Service based on Task Definition. 
 
-Import the template from `ECS/Common/CF_Cluster_ECSFargate.yaml`, that is creating a Cluster and starting a Service based on `TaskDefinition` name provided. It also creates a Security Group and opens a port of the appplication inisde a container, so it can be accessed from the internet.
+Import the template from `ECS/Common/CF_Cluster_ECSFargate.yaml`, that is creating a Cluster and starting a Service based on `TaskDefinition` name provided. It also creates a Security Group and opens a port of the appplication inisde a container, so it can be accessed from the internet:
+
+<img width="1291" alt="CloudFormation -cluster-resources" src="https://user-images.githubusercontent.com/23483887/104924751-c8469480-5995-11eb-8343-e2ec4b6a5fcd.png">
 
 In order to observe the created resources navigate to Elastic Container Service (ECS) service:
 
 ![ecs_service](https://user-images.githubusercontent.com/23483887/104918727-15723880-598d-11eb-9ed1-1f33373ef0bb.png)
+
+And observe a cluster:
+
+<img width="1033" alt="Amazon ECS-cluster" src="https://user-images.githubusercontent.com/23483887/104924960-13f93e00-5996-11eb-86af-f21354f2e4f3.png">
+
+
 
 
