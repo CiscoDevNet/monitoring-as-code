@@ -6,17 +6,17 @@ Please note that screenshots are taken for the .NET Core application Stack, howe
 
 ## Preparation
 
-Creating resources is going to be performed by using *ClouFormation* service, that can be accessed from AWS cosnole:
+Creating resources is going to be performed by using *CloudFormation* service, that can be accessed from the AWS console:
 
 ![cloud_formation](https://user-images.githubusercontent.com/23483887/104907306-c8866600-597c-11eb-9ed9-b116523ab14f.png)
 
-CloudFormation is AWS tool of choice for achieving infrastructure-as-a-code (Iaas) as it gains popularity with stability, consistency and cost reduction it accompanies.
+CloudFormation is AWS tool of choice for achieving infrastructure-as-a-code (Iaas) as it gains popularity with stability, consistency, and cost reduction it accompanies.
 
-CloudFormation provides infrastructure on AWS by utilizing *Templates* representing a collection of resource definitions that make up a *Stack*. As templates are nothing but YAML or JSON files that can be handled any text editor, easy to understand by humans and machines, and that easily can be version controlled.
+CloudFormation provides the infrastructure on AWS by utilizing *Templates* representing a collection of resource definitions that make up a *Stack*. As templates are nothing but YAML or JSON files that can be handled by any text editor, easy to understand by humans and machines, and that easily can be version controlled.
 
-Note that using CloudFormation service is free, but you are paying for the resources that you create in the process.
+Note that using a CloudFormation service is free, but you are paying for the resources that you create in the process.
 
-Here, new resources ar going to be created:
+Here, new resources are going to be created:
 
 ![create_stack](https://user-images.githubusercontent.com/23483887/104905300-10f05480-597a-11eb-9fa1-1610104a79c6.png)
 
@@ -28,15 +28,15 @@ Alternatively, you can upload templates to S3 bucket and fetch them from there.
 
 ### Create Secrets
 
-We are using AWS Secret Manager as a secrets management service, where we are storing AppDynamics Controller's access key.
+We are using AWS Secret Manager, AWS secrets management service, where we are storing AppDynamics Controller's access key.
 
-Secret value is stored as a as plaintext, without quotes, as that is going to be a value of our environment variable.
+The secret value is stored as plaintext, without quotes, as that is going to be a value of our environment variable.
 
 For this purpose, CloudFormation template is provided in "ECS/Common/CF_Secret_ECSFargate.yaml"
 
-When uploading a template, update the value of `AppdAccountSecretKey` to match your controller's value. There is an option to update the secret key, but note that in that case application templates should be updates as well in order to fetch this new key by name.
+When uploading a template, update the value of `AppdAccountSecretKey` to match your controller's value. There is an option to update the secret key, but note that in that case, application templates should be updated as well to fetch this new key by name.
 
-When secret gets's created keep note of the *Secret ARN* created as we are going to need this value later on.
+When a secret gets created keep note of the *Secret ARN* created as we are going to need this value later on. Note that this ARN can ce accessed any time from a Stack Resources section as well.
 
 ![aws-secret-arn](https://user-images.githubusercontent.com/23483887/101660379-04094880-3a3f-11eb-9318-21cbfa9edb5f.png)
 
@@ -54,7 +54,7 @@ An IAM role is an IAM identity that you can create in your account that has spec
 
 #### CloudFormation Policy and Role
 
-In order to assign permissions, following the least-privilege principle, in `ECS/Common/cf-cluster-cloud-formation-policy.json` file a policy is defined that needs at least to be assigned to a CloudFormation role in order for it to be able to create, delete, get and modify resources to deploy desired applications and their dependencies.
+to assign permissions, following the least-privilege principle, in `ECS/Common/cf-cluster-cloud-formation-policy.json` file a policy is defined that needs at least to be assigned to a CloudFormation role for it to be able to create, delete, get and modify resources to deploy desired applications and their dependencies.
 
 Create a policy, manually in AWS Console (IAM > Policies > Create Policy) or using an AWS CLI (file `cloud-formation-policy-create.sh`).
 
@@ -104,13 +104,13 @@ Stack Events can be observed and when status changes to UPDATE_COMPLETED, procee
 
 "Task definitions specify the container information for your application, such as how many containers are part of your task, what resources they will use, how they are linked together, and which host ports they will use." [learn more](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html)
 
-In order to run a Task Definition that we created in previous step, we are going to create a Fargate (Serverless) Cluster and run a Service based on Task Definition. 
+In order to run a Task Definition that we created in the previous step, we are going to create a Fargate (Serverless) Cluster and run a Service based on Task Definition. 
 
-Import the template from `ECS/Common/CF_Cluster_ECSFargate.yaml`, that is creating a Cluster and starting a Service based on `TaskDefinition` name provided. It also creates a Security Group and opens a port of the appplication inisde a container, so it can be accessed from the internet:
+Import the template from `ECS/Common/CF_Cluster_ECSFargate.yaml`, that is creating a Cluster and starting a Service based on `TaskDefinition` name provided. It also creates a Security Group and opens a port of the application inside a container, so it can be accessed from the internet:
 
 <img width="1291" alt="CloudFormation -cluster-resources" src="https://user-images.githubusercontent.com/23483887/104924751-c8469480-5995-11eb-8343-e2ec4b6a5fcd.png">
 
-In order to observe the created resources navigate to Elastic Container Service (ECS) service:
+To observe the created resources navigate to Elastic Container Service (ECS) service:
 
 ![ecs_service](https://user-images.githubusercontent.com/23483887/104918727-15723880-598d-11eb-9ed1-1f33373ef0bb.png)
 
