@@ -81,7 +81,7 @@ To name the stack, provide intuitive naming at the top of the screen:
 In the same step, update parameters, besides controller connection details, make sure to update at least the following field:
 - `AppDSecretAccessKey` - value should be *Secret ARN* of a secret created in "Create Secrets" section.
 
-![CloudFormation-Parameters](https://user-images.githubusercontent.com/23483887/101676355-f8c01800-3a52-11eb-84f9-07ba9a91c999.png)
+<img width="995" alt="CloudFormation-parameters" src="https://user-images.githubusercontent.com/23483887/104917802-d1caff00-598b-11eb-8ba8-d98b38094b06.png">
 
 Here, note that `ServiceName` is going to determine your Task definition name, so set it accordingly, and bear in mind that to this name "TaskDefinition" string is going to be appended at the end to form a Task definition name.
 
