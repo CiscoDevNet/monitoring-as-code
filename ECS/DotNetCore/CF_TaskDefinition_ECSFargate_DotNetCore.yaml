@@ -22,17 +22,17 @@ Parameters:
   # secrets
   AppDSecretAccessKey:
     Type: String
-    Default: arn:aws:secretsmanager:eu-west-2:032263611943:secret:APPDYNAMICS_ACCOUNT_ACCESS_KEY-Gb3Xli
+    Default: arn:aws:secretsmanager:eu-west-2:<account-number>:secret:APPDYNAMICS_ACCOUNT_ACCESS_KEY-abcXyz
   # AppD properties
   AppDControllerHost:
     Type: String
-    Default: nwmaas-2081nosshcontro-dw1rwn6a.appd-cx.com
+    Default: controller.saas.appdynamics.com
   AppDControllerPort:
     Type: Number
-    Default: 8090
+    Default: 443
   AppDControllerSslEnabled:
     Type: String
-    Default: false
+    Default: true
     AllowedValues: [true, false]
   AppDAgentAccountName:
     Type: String
