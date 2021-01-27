@@ -10,9 +10,12 @@ spec:
   template:
     metadata:
       labels:
-        app: dotnet-app-deployment-init
-        tier: backend
-        track: stable
+        app: dotnet-app
+        owner: teamXY
+        tier: foo-service
+        node: foo
+        track: prod
+        language: dotnet
     spec:
       serviceAccountName: appd-account
       volumes:

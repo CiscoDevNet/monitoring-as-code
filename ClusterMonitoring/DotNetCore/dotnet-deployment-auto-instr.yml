@@ -14,7 +14,8 @@ spec:
     metadata:
       labels:
         app: appd-dotnet-deployment-auto
-        tier: backend
+        tier: foo-service
+        nodeName: foo 
     spec:
       serviceAccountName: appd-account
       containers:
