@@ -1,0 +1,29 @@
+apiVersion: v2
+name: cluster-agent
+
+description: Sophisticated helm chart to deploy cluster agent is addition with advanced features like multiple cluster agent deployments, Granular control over config with intuitive boolean switches. 
+home: https://appdynamics.com
+icon: https://raw.githubusercontent.com/Appdynamics/appdynamics-charts/master/logo.png
+
+version: 0.1.12
+
+appVersion: 20.12.1
+
+dependencies:
+  - name: metrics-server
+    repository: https://charts.helm.sh/stable/
+    version: 2.11.4
+    condition: install.metrics-server
+
+maintainers:
+  - name: AppDynamics
+    email: support@appdynamics.com
+
+keywords:
+  - appdynamics
+  - cluster
+  - kubernetes
+  - openshift
+  - monitoring
+  - pod
+  - deployment
