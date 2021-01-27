@@ -46,6 +46,8 @@ Dry run injecting secret from environment variables:
 `helm install --dry-run --set controllerInfo.accessKey=$CONTROLLER_ACCESS_KEY --debug cluster-agent appdynamics-charts/cluster-agent -f values.yaml --namespace appdynamics-helm`
 
 Apply changes:
-
 `helm upgrade --set controllerInfo.accessKey=$CONTROLLER_ACCESS_KEY cluster-agent appdynamics-charts/cluster-agent -f values.yaml --namespace appdynamics-helm`
+
+Set cluster agent name:
+`helm install --set controllerInfo.accessKey=$CONTROLLER_ACCESS_KEY --set clusterAgent.appName="custom-cluster-name"  cluster-agent appdynamics-charts/cluster-agent -f values.yaml --namespace appdynamics-helm`
 
