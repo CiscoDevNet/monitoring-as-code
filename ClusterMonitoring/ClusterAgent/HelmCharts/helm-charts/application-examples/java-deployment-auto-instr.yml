@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appd-java-deployment-auto
+  labels:
+    appName: Java-Deployment-Auto-App
+    language: java
+spec:
+  selector:
+    matchLabels:
+      app: appd-java-deployment-auto
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        appName: Java-AutoInstrumented
+        app: appd-java-deployment-auto
+        tier: backend
+    spec:
+      serviceAccountName: appd-account
+      containers:
+      - image: sashaz/java-services:v6 # application image
+        imagePullPolicy: Always
+        name: java-app-deployment-auto
+        command: 
+           - /bin/sh
+           - -c
+           - java -jar /java-services.jar
+        ports:
+        - name: http
+          containerPort: 8080
+        resources: 
+          limits:
+            cpu: 500m
+            memory: 500M
+          requests:
+            cpu: 500m
+            memory: 500M
+        # envFrom:
+        # - configMapRef:
+        #     name: appd-java-config
+        # env:
+        # - name: APPDYNAMICS_AGENT_TIER_NAME
+        #   value: differentTier
+        # - name: APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: appd-secrets
+        #       key: account-access-key
+

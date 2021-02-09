@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appd-dotnet-deployment-auto
+  labels:
+    appName: DotNet-Deployment-Auto-No-Init
+    language: dotnet
+spec:
+  selector:
+    matchLabels:
+      app: appd-dotnet-deployment-auto
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        appName: DotNet-AutoInstrumented
+        app: appd-dotnet-deployment-auto
+        tier: foo-service
+        nodeName: foo 
+    spec:
+      serviceAccountName: appd-account
+      containers:
+      - image: microsoft/dotnet-samples:aspnetapp # application image
+        imagePullPolicy: Always
+        name: dotnet-app-deployment-auto
+        ports:
+        - name: http
+          containerPort: 80
+        resources: 
+          limits:
+            cpu: 100m
+            memory: 100M
+          requests:
+            cpu: 50m
+            memory: 100M
+        # envFrom:
+        # - configMapRef:
+        #     name: appd-dotnet-config
+        # env:
+        # - name: APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: appd-secrets
+        #       key: account-access-key
+

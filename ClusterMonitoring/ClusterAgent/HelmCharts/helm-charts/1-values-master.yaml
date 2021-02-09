@@ -1,0 +1,70 @@
+# Cluster agent deployment mode (MASTER | NAMESPACED)
+deploymentMode: MASTER
+
+# Docker images
+imageInfo:
+  agentImage: docker.io/appdynamics/cluster-agent # docker.io/alexappd/cluster-agent # docker.io/appdynamics/cluster-agent
+  agentTag: 20.12.1 # no-default # 20.12.1
+  operatorImage: docker.io/appdynamics/cluster-agent-operator # alexappd/cluster-agent-operator
+  operatorTag: 0.6.6 # latest
+  imagePullPolicy: Always    
+
+# RBAC config
+createServiceAccount: true
+agentServiceAccount: appdynamics-cluster-agent
+operatorServiceAccount: appdynamics-operator
+
+# Cluster agent config
+clusterAgent:
+  nsToMonitor:
+    - default
+    - dev
+  clusterMetricsSyncInterval: 60
+  metadataSyncInterval: 60
+  eventUploadInterval: 10
+  httpClientTimeout: 30
+  podBatchSize: 6
+  imagePullSecret: ""
+  containerProperties:
+    containerBatchSize: 5
+    containerParallelRequestLimit: 1
+    containerRegistrationInterval: 120
+  logProperties:
+    logFileSizeMb: 5
+    logFileBackups: 3
+    logLevel: DEBUG
+  metricProperties:
+    metricsSyncInterval: 30
+    metricUploadRetryCount: 2
+    metricUploadRetryIntervalMilliSeconds: 5
+
+# Pod filter config
+podFilter: {}
+
+# Agent pod specific properties
+agentPod:
+  nodeSelector: {}
+  tolerations: []
+  resources:
+    limits:
+      cpu: "1250m"
+      memory: "300Mi"
+    requests:
+      cpu: "750m"
+      memory: "150Mi"
+
+# Operator pod specific properties
+operatorPod:
+  nodeSelector: {}
+  tolerations: []
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
+
+# Subcharts boolean install switches
+install:
+  metrics-server: false
