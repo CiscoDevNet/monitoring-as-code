@@ -36,7 +36,14 @@ spec:
           requests:
             cpu: 500m
             memory: 500M
-        # envFrom:
+        env:
+          - name: APPDYNAMICS_AGENT_NODE_NAME
+            value: JavaNode
+          - name: APPDYNAMICS_AGENT_REUSE_NODE_NAME
+            value: "true"
+          # - name: JAVA_TOOL_OPTIONS
+          #   value: " -javaagent:/opt/appdynamics-java/javaagent.jar -Dappdynamics.jvm.shutdown.mark.node.as.historical=true -Dappdynamics.agent.accountAccessKey=$(APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY) -Dappdynamics.agent.reuse.nodeName=true -Dappdynamics.socket.collection.bci.enable=true "
+          # envFrom:
         # - configMapRef:
         #     name: appd-java-config
         # env:

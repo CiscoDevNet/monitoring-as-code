@@ -21,7 +21,8 @@ instrumentationConfig:
       appName: Sample-Java-Rule
       tierName: TIER_ONE
       env: JAVA_OPTS
-      instrumentContainer: all
+      instrumentContainer: select
+      containerMatchString: java|appd
       runAsUser: 100
       runAsGroup: 100
       language: java

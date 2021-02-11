@@ -4,7 +4,7 @@ deploymentMode: MASTER
 # Docker images
 imageInfo:
   agentImage: docker.io/appdynamics/cluster-agent # docker.io/alexappd/cluster-agent # docker.io/appdynamics/cluster-agent
-  agentTag: 20.12.1 # no-default # 20.12.1
+  agentTag: 20.10.0 # no-default # 20.12.1
   operatorImage: docker.io/appdynamics/cluster-agent-operator # alexappd/cluster-agent-operator
   operatorTag: 0.6.6 # latest
   imagePullPolicy: Always    
