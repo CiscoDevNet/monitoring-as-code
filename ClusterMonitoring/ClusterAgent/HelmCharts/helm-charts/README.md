@@ -51,3 +51,6 @@ Apply changes:
 Set cluster agent name:
 `helm install --set controllerInfo.accessKey=$CONTROLLER_ACCESS_KEY --set clusterAgent.appName="custom-cluster-name"  cluster-agent appdynamics-charts/cluster-agent -f values.yaml --namespace appdynamics-helm`
 
+Apply multiple value files and set access-key secret:
+`helm install --set controllerInfo.accessKey="c5c7e458-bd5d-4046-85ba-099868f11869" --set clusterAgent.appName="auto-instrumentation-label-based"  cluster-agent appdynamics-charts/cluster-agent -f 1-values-master.yaml -f 2-values-secrets.yaml -f 3-values-controller-prod.yaml -f 4-values-master-auto-instr.yaml  --namespace appdynamics-helm`
+

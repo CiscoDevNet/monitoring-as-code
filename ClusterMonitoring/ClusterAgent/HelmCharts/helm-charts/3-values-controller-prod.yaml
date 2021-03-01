@@ -1,0 +1,22 @@
+# AppDynamics controller info (null VALUES TO BE PROVIDED BY THE USER)
+controllerInfo:
+  url: http://nwmaas-20110nosshcontr-nkjoysw4.appd-cloudmachine.com:8090 # Required
+  # account: customer1 # Required
+  # username: appd
+  # password: appd
+  # accessKey: SECRET_VALUE # Required
+  
+  # SSL properties
+  customSSLCert: null
+  
+  # Proxy config
+  authenticateProxy: false
+  proxyUrl: null
+  proxyUser: null
+  proxyPassword: null 
+
+
+TeamInfo:
+  teamName: Horizon
+  environment: prod
+  
