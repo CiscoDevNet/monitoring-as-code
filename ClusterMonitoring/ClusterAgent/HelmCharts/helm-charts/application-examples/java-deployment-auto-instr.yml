@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   name: appd-java-deployment-auto
   labels:
-    appName: Java-Deployment-Auto-App
-    language: java
+    appName: Java-deployment-label
+    lang: java
 spec:
   selector:
     matchLabels:
@@ -13,14 +13,14 @@ spec:
   template:
     metadata:
       labels:
-        appName: Java-AutoInstrumented
+        appName: Java-template-label
         app: appd-java-deployment-auto
         tier: backend
     spec:
       serviceAccountName: appd-account
       containers:
       - image: sashaz/java-services:v6 # application image
-        imagePullPolicy: Always
+        imagePullPolicy: "IfNotPresent"
         name: java-app-deployment-auto
         command: 
            - /bin/sh
@@ -36,11 +36,11 @@ spec:
           requests:
             cpu: 500m
             memory: 500M
-        env:
-          - name: APPDYNAMICS_AGENT_NODE_NAME
-            value: JavaNode
-          - name: APPDYNAMICS_AGENT_REUSE_NODE_NAME
-            value: "true"
+        # env:
+        #   - name: APPDYNAMICS_AGENT_NODE_NAME
+        #     value: JavaNode
+        #   - name: APPDYNAMICS_AGENT_REUSE_NODE_NAME
+        #     value: "true"
           # - name: JAVA_TOOL_OPTIONS
           #   value: " -javaagent:/opt/appdynamics-java/javaagent.jar -Dappdynamics.jvm.shutdown.mark.node.as.historical=true -Dappdynamics.agent.accountAccessKey=$(APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY) -Dappdynamics.agent.reuse.nodeName=true -Dappdynamics.socket.collection.bci.enable=true "
           # envFrom:

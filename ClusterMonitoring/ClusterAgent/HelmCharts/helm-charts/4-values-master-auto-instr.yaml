@@ -1,43 +1,33 @@
 #=====
 instrumentationConfig:
   enabled: true
-  defaultEnv: JAVA_TOOL_OPTIONS
+  #defaultEnv: JAVA_TOOL_OPTIONS
   instrumentationMethod: Env
-  appNameStrategy: label # name by label!
+  appNameStrategy: label #label # name by label!
   appNameLabel: appName
-  nsToInstrumentRegex: appd-dotnet-agent|java-project|dev
   defaultAppName: sample-app
-  #defaultCustomConfig: "-Dhello -Dhi -Daloha"
-  numberOfTaskWorkers: 3
-  imagePullPolicy: Always
+  nsToInstrumentRegex: dev|java|dotnet
   defaultInstrumentationLabelMatch:
-    - language: java
-    - language: dotnet
+    - lang: java
+    - lang: dotnet
   instrumentationRules:
     - matchString: java # Regular expression to match on deployment name, defaultInstrumentMatchString provides default
-      #namespaceRegex: apm
-      #appNameLabel: appName
-      #customAgentConfig: "-Dhola"
-      appName: Sample-Java-Rule
-      tierName: TIER_ONE
-      env: JAVA_OPTS
+      appNameLabel: appName
       instrumentContainer: select
-      containerMatchString: java|appd
-      runAsUser: 100
-      runAsGroup: 100
+      containerMatchString: java
       language: java
       imageInfo:
         image: "docker.io/appdynamics/java-agent:latest"
         agentMountPath: "/opt/appdynamics"
         imagePullPolicy: "IfNotPresent"
-    - labelMatch:
-       - language: dotnet
-      appNameLabel: appName
-      instrumentContainer: all
+    - appNameStrategy: label
+      labelMatch: 
+      - lang: dotnet # label to match
+      matchString: ^appd-dotnet.* # A) full match, can be "catch-all", but needs to exist
+      appNameLabel: appName # B) label name needs to be provided on this level, not inherited from instrumentationConfig
       language: dotnetcore
       imageInfo:
-        image: "docker.io/appdynamics/dotnet-core-agent:latest"
+        image: "docker.io/appdynamics/dotnet-core-agent:20.9.0-linux" # C) use linux, not alpine
         agentMountPath: /opt/appdynamics
-        imagePullPolicy: "IfNotPresent"
 #=====
 

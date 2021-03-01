@@ -14,3 +14,9 @@ controllerInfo:
   proxyUrl: null
   proxyUser: null
   proxyPassword: null 
+
+
+TeamInfo:
+  teamName: Horizon
+  environment: prod
+  

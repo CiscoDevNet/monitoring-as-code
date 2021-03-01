@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   name: appd-dotnet-deployment-auto
   labels:
-    appName: DotNet-Deployment-Auto-No-Init
-    language: dotnet
+    appName: DotNet-deployment-label
+    lang: dotnet
 spec:
   selector:
     matchLabels:
@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       labels:
-        appName: DotNet-AutoInstrumented
+        appName: DotNet-template-label
         app: appd-dotnet-deployment-auto
         tier: foo-service
         nodeName: foo 
@@ -21,18 +21,18 @@ spec:
       serviceAccountName: appd-account
       containers:
       - image: microsoft/dotnet-samples:aspnetapp # application image
-        imagePullPolicy: Always
+        imagePullPolicy: "IfNotPresent"
         name: dotnet-app-deployment-auto
         ports:
         - name: http
           containerPort: 80
         resources: 
           limits:
-            cpu: 100m
-            memory: 100M
+            cpu: 600m
+            memory: 600M
           requests:
-            cpu: 50m
-            memory: 100M
+            cpu: 600m
+            memory: 600M
         # envFrom:
         # - configMapRef:
         #     name: appd-dotnet-config

@@ -7,7 +7,7 @@ imageInfo:
   agentTag: 20.10.0 # no-default # 20.12.1
   operatorImage: docker.io/appdynamics/cluster-agent-operator # alexappd/cluster-agent-operator
   operatorTag: 0.6.6 # latest
-  imagePullPolicy: Always    
+  imagePullPolicy: "IfNotPresent"    
 
 # RBAC config
 createServiceAccount: true
@@ -47,10 +47,10 @@ agentPod:
   tolerations: []
   resources:
     limits:
-      cpu: "1250m"
-      memory: "300Mi"
+      cpu: "300m"
+      memory: "200Mi"
     requests:
-      cpu: "750m"
+      cpu: "200m"
       memory: "150Mi"
 
 # Operator pod specific properties
