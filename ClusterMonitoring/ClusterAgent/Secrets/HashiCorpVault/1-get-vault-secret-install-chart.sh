@@ -19,8 +19,6 @@ kubectl get pods -n $NAMESPACE_NAME
 
 echo -e "> Set environment variable"
 
-# pods=$(kubectl get pods)
-# echo "PODS $pods"
 POD_NAME=$(kubectl get pods | grep -o 'app[^[:space:]]*')
 
 echo -e ">> Exec into pod \n"
@@ -29,16 +27,11 @@ echo "kubectl exec -it -c app $POD_NAME -n $NAMESPACE_NAME -- cat /vault/secrets
 VAULT_ACCESS_KEY=$(kubectl exec -it -c app $POD_NAME -n $NAMESPACE_NAME -- cat /vault/secrets/appdaccesskey)
 
 echo $VAULT_ACCESS_KEY
-# e.g. value is:  b0248ceb-c954-4a37-97b5-207e90418cb4
+# e.g. value is:  b0248ceb-xxxx-4a37-97b5-207e90418cb4
 
 echo -e "> Upgrade AppDynamics Helm chart (or delete and create) \n"
 
-cd ../../helm-charts/
-
-#helm delete cluster-agent --namespace appdynamics-helm
-
-echo "helm upgrade --set controllerInfo.accessKey=$VAULT_ACCESS_KEY --set clusterAgent.appName=custom-cluster-name \
-      cluster-agent appdynamics-charts/cluster-agent -f values.yaml --namespace appdynamics-helm"
+cd HelmCharts/helm-charts
 
 helm upgrade --set controllerInfo.accessKey=$VAULT_ACCESS_KEY --set clusterAgent.appName="custom-cluster-name" \
       cluster-agent appdynamics-charts/cluster-agent -f values.yaml --namespace appdynamics-helm
