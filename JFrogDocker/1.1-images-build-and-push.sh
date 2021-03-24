@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # example script usage:
-# ./1-build-and-push.sh curl-appd 20.11 my-server.jfrog.io repo-name alex ug785HJH-my-access-key-UFJKHJ56321
+# ./1-build-and-push.sh curl-appd 20.11 jfrogservername.jfrog.io repo-name alex ug785HJH-my-access-key-UFJKHJ56321
 
 image_name=${1}
 image_tag=${2}
@@ -13,7 +13,7 @@ jfrog_apikey=${6}
 
 
 if [ "$image_name" = "" ]; then
-    image_name="curlimages-appd-agent-files"
+    image_name="image-name-here"
 fi
 
 if [ "$image_tag" = "" ]; then
@@ -22,7 +22,7 @@ fi
 
 
 if [ "$jfrog_server" = "" ]; then
-    jfrog_server="my-server.jfrog.io"
+    jfrog_server="jfrogservername.jfrog.io"
 fi
 
 if [ "$jfrog_repo" = "" ]; then
@@ -45,11 +45,11 @@ docker build -t "${handle}/${image_name}:${image_tag}" . --no-cache
 # 2. JFrog artifactory server needs to be set before the following step
 # docs: https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-Configuration
 ## for example:
-## jfrog rt config my-server-id --url https://my-server.jfrog.io/artifactory --user <user-here> --apikey <api-key-here>
-## jfrog rt use my-server-id
+## jfrog rt config jfrogservername-id --url https://jfrogservername.jfrog.io/artifactory --user <user-here> --apikey <api-key-here>
+## jfrog rt use jfrogservername-id
 
 # 3. Run Docker image
-# docker run alexappd/curlimages-appd-agent-files:latest
+# docker run alexappd/jfrogservername:latest
 
 # 4. Push Docker image to JFrog Artifactory
 # docs: https://www.jfrog.com/confluence/display/CLI/CLI+for+JFrog+Artifactory#CLIforJFrogArtifactory-PushingDockerImagesUsingtheDockerClient
