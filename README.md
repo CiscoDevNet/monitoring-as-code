@@ -1,4 +1,4 @@
-# AppDynamicsMonitoring-As-Code Artefacts 
+# AppDynamics Monitoring-As-Code Artefacts 
 
 This repo contains divers re-useable monitoring-as-code artefacts. 
 
