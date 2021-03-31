@@ -10,5 +10,6 @@ These artefacts are solutions that we have created for customers in the field, n
 - How to add create AppDynamics agent images - using your hardened image as a base. 
   - Docker multi-stage image build examples 
   - JFrog artefactory examples 
+  - JFrog and Helmchats examples 
   - Ready-to-go bash scripts to do all of the above for you - just supply the params 
   
