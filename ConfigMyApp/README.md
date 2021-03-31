@@ -6,4 +6,4 @@ Configuration as code allows the entire configurations to be stored as source co
 
 ConfigMyApp saves time, hassle and cost, as it reduces human error and time-to-value while it maintains consistency of thresholds and naming conventions across your estate.  
 
-Please refer to the full ConfigMyApp docs - <a href="https://appdynamics.github.io/ConfigMyApp/">
+Please refer to the full ConfigMyApp docs - <a href="https://appdynamics.github.io/ConfigMyApp/"> https://appdynamics.github.io/ConfigMyApp </a>
