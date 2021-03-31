@@ -5,3 +5,5 @@ ConfigMyApp enhances rapid rollout of AppDynamics. We built it based on the DevO
 Configuration as code allows the entire configurations to be stored as source code.  It moves the management of certain configurations from the UI to the developer's integrated development environment. This approach brings a lot of benefits such as versioning of changes, traceability of state changes, smooth promotion of config changes from test to production controller, and the likes. 
 
 ConfigMyApp saves time, hassle and cost, as it reduces human error and time-to-value while it maintains consistency of thresholds and naming conventions across your estate.  
+
+Please refer to the full ConfigMyApp docs - <a href="https://appdynamics.github.io/ConfigMyApp/">
