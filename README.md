@@ -10,5 +10,5 @@ These artefacts are solutions that we have created for customers in the field, n
 - How to add create AppDynamics agent images - using your hardened image as a base. 
   - Multistage build examples 
   - JFrog artefactor examples 
-  - Ready-to-go bash script to do all the above for you 
+  - Ready-to-go bash script to do all of the above for you 
   
