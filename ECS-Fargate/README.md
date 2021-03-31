@@ -20,9 +20,11 @@ The primary considerations that went into the design of this project are:
 
 Our approach is consistent regardless of the automation tool in use - customers would have to introduce AppDynamics container into the task using the <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-dependson.html"> `DependsOn` </a> attribute.
 
-At runtime, we acquire AppDynamics Java or .Net core agent from DockerHub at deploy time, load the agent binaries into a shared ephemeral storage and exist the AppDynamics container. When the main application container is starting up, it mounts the shared agent volume and injects the agent.
+At deploy time, we acquire AppDynamics Java or .Net core agent from DockerHub, load the agent binaries into a shared ephemeral storage and exit the AppDynamics container. When the main application container is starting up, it mounts the shared agent volume and injects the agent.
 
 The approach described above is similar to the Kubernetes init container pattern.
+
+An alternative approach is to mount the agent binaries into persistent storage - such as `EFS`, then mount into the container when it is starting up. The disadvantage with this approach is you would have to create yet another automation process to regularly update the agent versions.  
 
 ## What is next?
 
@@ -33,12 +35,12 @@ There are two aspects to monitoring ECS Fargate:
 
 Now that we have completed the first phase, which is containerised Java and .Net Core application, our next focus is to provide visibility into the cluster/task health. We will achieve this by developing a lambda function that collects <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-metrics-ECS.html"> `ECS cluster ECS Container Insights Metrics` </a> from CloudWatch into AppDynamics custom analytics schema.
 
-Since custom analytics data and APM data does not correlate, we will also provide an automated dashboard template via  <a href="https://appdynamics.github.io/ConfigMyApp/"> ConfigMyApp </a> - that combines both ECS APM and the cluster health visibility in a single pane of glass.  ConfigMyApp can also be used to create or update the associated health rules.
+Since custom analytics data and APM data does not correlate in AppDynamics, we will also provide an automated dashboard template via  <a href="https://appdynamics.github.io/ConfigMyApp/"> ConfigMyApp </a> - that combines both ECS APM and the cluster health visibility in a single pane of glass.  ConfigMyApp can also be used to create or update the related health rules.
 
-## How about ECS EC2 launch type? 
+## How about ECS EC2 launch type?
 
-We have not have any plans to support EC2 launch type due to low demand, but do reach out if you need it.
+We do not plan to support EC2 launch type due to low demand, but feel free to contact us if you need it. 
 
-## Questions?
+## How do I contact you?
 
 Please create an issue in this repo
