@@ -46,15 +46,9 @@ AWS Identity and Access Management (IAM) is a web service that helps you securel
 
 You manage access in AWS by creating policies and attaching them to IAM identities or AWS resources. 
 
-Policies are JSON documents in AWS that, when attached to an identity or resource, define their permissions. This is how all the requests in AWS are authorized (answers the question: do I have permissions?, while authentication is a process of verifying the identity of a person or device e.g. when you sign in with your username and password).
+#### Create CloudFormation Policy and Role [Optional]
 
-We are going to need to be allowed to fetch the created secret, and in case that we already do not have an IAM role ready for a CloudFormation stack, we are going to need to create a policy to attach to its IAM Role. 
-
-An IAM role is an IAM identity that you can create in your account that has specific permissions. More about IAM Roles can be found [here](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html).
-
-#### CloudFormation Policy and Role
-
-to assign permissions, following the least-privilege principle, in `ECS/Common/cf-cluster-cloud-formation-policy.json` file a policy is defined that needs at least to be assigned to a CloudFormation role for it to be able to create, delete, get and modify resources to deploy desired applications and their dependencies.
+To assign permissions, following the least-privilege principle, in `ECS/Common/cf-cluster-cloud-formation-policy.json` file a policy is defined that needs at least to be assigned to a CloudFormation role for it to be able to create, delete, get and modify resources to deploy desired applications and their dependencies.
 
 Create a policy, manually in AWS Console (IAM > Policies > Create Policy) or using an AWS CLI (file `cloud-formation-policy-create.sh`).
 
@@ -100,7 +94,7 @@ Stack Events can be observed and when status changes to UPDATE_COMPLETED, procee
 ![CloudFormation-Created](https://user-images.githubusercontent.com/23483887/101676729-771cba00-3a53-11eb-83e2-4150293adc32.png)
 
 
-## Create a Fargate Cluster and run a Task
+## Create a Fargate Cluster and Run a Task
 
 "Task definitions specify the container information for your application, such as how many containers are part of your task, what resources they will use, how they are linked together, and which host ports they will use." [learn more](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html)
 
