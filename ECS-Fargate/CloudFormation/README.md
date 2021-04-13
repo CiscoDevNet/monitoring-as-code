@@ -10,7 +10,7 @@ Creating resources is going to be performed by using *CloudFormation* service, t
 
 ![cloud_formation](https://user-images.githubusercontent.com/23483887/104907306-c8866600-597c-11eb-9ed9-b116523ab14f.png)
 
-CloudFormation is AWS tool of choice for achieving `infrastructure-as-a-code (IaC)` as it gains popularity with stability, consistency, and cost reduction it accompanies.
+CloudFormation is AWS tool of choice for achieving **infrastructure-as-a-code (IaC)** as it gains popularity with stability, consistency, and cost reduction it accompanies.
 
 CloudFormation provides the infrastructure on AWS by utilizing *Templates* representing a collection of resource definitions that make up a *Stack*. As templates are nothing but YAML or JSON files that can be handled by any text editor, easy to understand by humans and machines, and that easily can be version controlled.
 
