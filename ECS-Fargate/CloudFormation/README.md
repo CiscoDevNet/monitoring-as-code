@@ -26,7 +26,7 @@ And since templates are already provided, they can be uploaded from a computer l
 
 Alternatively, you can upload templates to S3 bucket and fetch them from there.
 
-### Create CloudFormation Policy and Role [Optional]
+## Create CloudFormation Policy and Role [Optional]
 
 To assign permissions to CloudFormation (CF), a role with permissions to create, delete, get and modify resources to deploy desired applications and their dependencies needs to be provided.Following the least-privilege principle, in `ECS/Common/cf-cluster-cloud-formation-policy.json` file a policy is defined that needs at least to be assigned to a CF.
 
@@ -38,7 +38,7 @@ Attach the policy to an existing CloudFormation role (IAM > Roles > [select role
 
 All the other roles/policies with regards to ECS Cluster are going to be created based on provided templates (with no additional interention).
 
-### 1. Create Secrets
+## 1. Create Secrets
 
 We are using AWS Secret Manager, AWS secrets management service, where we are storing AppDynamics Controller's access key.
 
@@ -60,7 +60,7 @@ Example application provided in the template is ready to go and provision Micros
 
 Learn more about [Task definition properties](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecs-taskdefinition.html).
 
-### Execute CloudFormation Stack 
+### Execute Stack 
 
 Navigate to CloudFormation Service and create a Stack, pick an option to do so from an existing resource, as we already have a template provided `ECS/DotNetCore/CF_TaskDefinition_ECSFargate_DotNetCore.yaml`.
 
@@ -92,7 +92,7 @@ Stack Events can be observed and when status changes to UPDATE_COMPLETED, procee
 ![CloudFormation-Created](https://user-images.githubusercontent.com/23483887/101676729-771cba00-3a53-11eb-83e2-4150293adc32.png)
 
 
-## 3. Create a Fargate Cluster and Run a Task
+## 3. Create ECS Fargate Cluster and Run a Task
 
 "Task definitions specify the container information for your application, such as how many containers are part of your task, what resources they will use, how they are linked together, and which host ports they will use." [learn more](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html)
 
