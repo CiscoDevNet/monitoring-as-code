@@ -9,12 +9,12 @@ rules:
     resources:
       - pods
       - pods/exec
-      - secrets
+      #- secrets
       - configmaps
     verbs:
       - create
       - update
-      - delete
+      #- delete
   - apiGroups:
       - apps
     resources:
@@ -31,5 +31,14 @@ rules:
       - deploymentconfigs
     verbs:
       - update
+  # added
+  - apiGroups:
+      - appdynamics.com
+    resources:
+      - secrets
+    verbs:
+      - create
+      - update
+      - delete
   {{- end }}
 {{- end }}

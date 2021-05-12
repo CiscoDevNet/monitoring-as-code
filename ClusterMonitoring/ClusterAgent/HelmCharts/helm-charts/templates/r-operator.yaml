@@ -26,9 +26,13 @@ rules:
     resources:
       - services
       - configmaps
-      - secrets
+      #- secrets
     verbs:
-      - "*"
+      #- "*"
+      - get
+      - watch
+      - list
+      - update
   - apiGroups:
       - apps
     resources:
@@ -44,7 +48,11 @@ rules:
       - replicasets
       - daemonsets
     verbs:
-      - "*"
+      #- "*"
+      - get
+      - watch
+      - list
+      - update
   - apiGroups:
       - "batch"
       - "extensions"
@@ -68,6 +76,7 @@ rules:
     resources:
       - '*'
       - clusteragents
+      - secrets
     verbs:
       - "*"
 {{ end -}}

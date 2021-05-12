@@ -16,8 +16,8 @@ rules:
       - events
       - namespaces
       - services
-      - configmaps
-      - secrets
+      #- configmaps
+      #- secrets
       - replicationcontrollers
     verbs:
       - get
