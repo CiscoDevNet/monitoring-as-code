@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: new-java-deployment
+  labels:
+    appName: Java-deployment-label
+    lang: java
+spec:
+  selector:
+    matchLabels:
+      app: new-java-deployment
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        appName: Java-template-label
+        app: new-java-deployment
+        tier: backend
+    spec:
+      serviceAccountName: appd-account
+      containers:
+      - image: sashaz/java-services:v6 # application image
+        imagePullPolicy: "IfNotPresent"
+        name: new-java-deployment
+        command: 
+           - /bin/sh
+           - -c
+           - java -jar /java-services.jar
+        ports:
+        - name: http
+          containerPort: 8080
+        resources: 
+          limits:
+            cpu: 500m
+            memory: 500M
+          requests:
+            cpu: 500m
+            memory: 500M
+

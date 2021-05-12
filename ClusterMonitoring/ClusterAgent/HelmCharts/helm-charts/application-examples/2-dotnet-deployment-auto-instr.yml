@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dotnet-new-deployment
+  labels:
+    appName: DotNet-deployment-label
+    lang: dotnet
+spec:
+  selector:
+    matchLabels:
+      app: dotnet-new-deployment
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        appName: DotNet-template-label
+        app: dotnet-new-deployment
+        tier: foo-service
+        nodeName: foo 
+    spec:
+      serviceAccountName: appd-account
+      containers:
+      - image: microsoft/dotnet-samples:aspnetapp # application image
+        imagePullPolicy: "IfNotPresent"
+        name: dotnet-new-deployment
+        ports:
+        - name: http
+          containerPort: 80
+        resources: 
+          limits:
+            cpu: 600m
+            memory: 600M
+          requests:
+            cpu: 600m
+            memory: 600M
+        # # envFrom:
+        # # - configMapRef:
+        # #     name: appd-dotnet-config
+        # env:
+        # - name: APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: appd-secrets
+        #       key: account-access-key
+

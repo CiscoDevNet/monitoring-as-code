@@ -3,7 +3,10 @@
 test env: minikube
 
 ## update rbac permissions 
-`helm chart yaml files`
+updated helm chart yaml files:
+- cr-agent-generic.yaml 
+- cr-agent-instrumentation.yaml
+- r-operator.yaml
 
 ## test
 

@@ -23,7 +23,7 @@ instrumentationConfig:
     - appNameStrategy: label
       labelMatch: 
       - lang: dotnet # label to match
-      matchString: ^appd-dotnet.* # A) full match, can be "catch-all", but needs to exist
+      matchString: .*dotnet.* # A) full match, can be "catch-all", but needs to exist
       appNameLabel: appName # B) label name needs to be provided on this level, not inherited from instrumentationConfig
       language: dotnetcore
       imageInfo:
