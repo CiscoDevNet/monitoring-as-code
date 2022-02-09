@@ -6,7 +6,7 @@ Parameters:
     Default: mcr.microsoft.com/dotnet/core/samples:aspnetapp
   AppdAgentImage:
     Type: String
-    Default: appdynamics/dotnet-core-agent:20.7.0
+    Default: appdynamics/dotnet-core-agent:22.1.1
   ServiceName:
     Type: String
     Default: DotNetCoreApp
@@ -153,9 +153,7 @@ Resources:
           Image: !Ref AppdAgentImage
           Essential: false 
           Command: # The command that is passed to the container.
-          - /bin/sh
-          - -c
-          - cp -r /opt/appdynamics/. /opt/temp
+          - /opt/temp
           mountPoints: # The mount points for data volumes in your container.
           - sourceVolume: 'appd-agent-volume'
             containerPath: '/opt/temp'
