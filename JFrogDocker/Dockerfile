@@ -16,7 +16,8 @@ RUN mkdir $APPD_DIRECTORY_MY_IMAGE
 RUN whoami
 USER root
 
-#todo - e.g. image hardening goes here
+#Include othe customisations here - including image hardening logic - if applicable. 
+
 RUN adduser -D limited_user
 USER limited_user
 
